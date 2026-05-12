@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tech Inventory Tracker</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;background:#071423;color:#fff}
+header{background:#0057b8;padding:18px 16px;position:sticky;top:0;z-index:5}
+header h1{font-size:20px;margin:0}
+header p{margin:4px 0 0;color:#dbeafe;font-size:13px}
+.screen{display:none;padding:14px 14px 90px}
+.screen.active{display:block}
+.card{background:#0f2137;border:1px solid #203b5c;border-radius:16px;padding:14px;margin:10px 0;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border:0;border-radius:14px;padding:14px;font-weight:700;font-size:15px;background:#1e88ff;color:white;width:100%;margin:6px 0}
+.btn.secondary{background:#223b5a}
+.btn.danger{background:#dc2626}
+.btn.good{background:#16a34a}
+input,select{width:100%;padding:13px;border-radius:12px;border:1px solid #385879;background:#08192b;color:#fff;margin:6px 0 12px;font-size:15px}
+label{font-size:13px;color:#b9d3f5}
+.item{display:flex;justify-content:space-between;gap:8px;align-items:center;border-bottom:1px solid #203b5c;padding:10px 0}
+.item:last-child{border-bottom:0}
+.small{font-size:12px;color:#a9c4e7}
+.badge{font-size:12px;padding:4px 8px;border-radius:999px;background:#1e3a5f}
+.low{background:#ef4444;color:white}
+.ok{background:#16a34a;color:white}
+nav{position:fixed;bottom:0;left:0;right:0;background:#08192b;border-top:1px solid #203b5c;display:grid;grid-template-columns:repeat(4,1fr);z-index:10}
+nav button{background:none;border:0;color:#b9d3f5;padding:10px 3px;font-size:12px}
+nav button.active{color:#fff;background:#0f2d4d}
+.qtybox{display:flex;gap:8px;align-items:center}
+.qtybox button{width:34px;height:34px;border-radius:10px;border:0;background:#1e88ff;color:white;font-weight:bold}
+h2{font-size:19px;margin:8px 0 4px}
+.stat{font-size:28px;font-weight:800}
+</style>
+</head>
+<body>
+<header>
+<h1>Tech Inventory Tracker</h1>
+<p>Truck parts, jobs, parts used, and low stock alerts</p>
+</header>
+
+<section id="home" class="screen active">
+  <div class="grid">
+    <div class="card"><div class="small">Total Parts</div><div id="totalParts" class="stat">0</div></div>
+    <div class="card"><div class="small">Low Stock</div><div id="lowCount" class="stat">0</div></div>
+    <div class="card"><div class="small">Jobs Logged</div><div id="jobCount" class="stat">0</div></div>
+    <div class="card"><div class="small">Parts Used</div><div id="usedCount" class="stat">0</div></div>
+  </div>
+  <button class="btn" onclick="showScreen('job')">Start / Log Job</button>
+  <button class="btn secondary" onclick="showScreen('inventory')">Update Truck Inventory</button>
+  <div class="card"><h2>Low Inventory Alerts</h2><div id="homeLowList"></div></div>
+</section>
+
+<section id="inventory" class="screen">
+  <h2>Truck Inventory</h2>
+  <input id="search" placeholder="Search part number or description" oninput="renderInventory()">
+  <select id="catFilter" onchange="renderInventory()"><option value="">All Categories</option></select>
+  <div id="inventoryList"></div>
+</section>
+
+<section id="job" class="screen">
+  <h2>Start Job / Add Parts Used</h2>
+  <div class="card">
+    <label>Job Number</label>
+    <input id="jobNumber" placeholder="Example: 133005200">
+    <label>Customer Name / Notes</label>
+    <input id="customer" placeholder="Optional">
+    <label>Job Type</label>
+    <select id="jobType"><option>Install</option><option>Service</option><option>Upgrade</option><option>GoBack</option></select>
+    <label>Part Used</label>
+    <select id="partSelect"></select>
+    <label>Quantity Used</label>
+    <input id="qtyUsed" type="number" min="1" value="1">
+    <button class="btn good" onclick="addPartUsed()">Add Part Used & Deduct Inventory</button>
+  </div>
+  <div class="card"><h2>Recent Job Usage</h2><div id="recentJobs"></div></div>
+</section>
+
+<section id="alerts" class="screen">
+  <h2>Low Inventory</h2>
+  <div id="alertList"></div>
+  <button class="btn secondary" onclick="exportData()">Export Backup JSON</button>
+  <button class="btn danger" onclick="resetApp()">Reset App Data</button>
+</section>
+
+<nav>
+  <button id="nav-home" class="active" onclick="showScreen('home')">Home</button>
+  <button id="nav-inventory" onclick="showScreen('inventory')">Inventory</button>
+  <button id="nav-job" onclick="showScreen('job')">Job</button>
+  <button id="nav-alerts" onclick="showScreen('alerts')">Alerts</button>
+</nav>
+
+<script>
+const defaultParts = [{"category": "KITS", "partNumber": "472540D", "description": "SW3000 Kit", "qty": 0, "minQty": 1}, {"category": "KITS", "partNumber": "QC3DTC", "description": "QC Kit", "qty": 0, "minQty": 1}, {"category": "KITS", "partNumber": "SWPCW6150C", "description": "SW Control Resi", "qty": 0, "minQty": 1}, {"category": "KEYPADS / FOBS / PANICS", "partNumber": "5834-4ADT", "description": "4 Button Fob", "qty": 0, "minQty": 1}, {"category": "KEYPADS / FOBS / PANICS", "partNumber": "6150ADT", "description": "Standard Keypad", "qty": 0, "minQty": 1}, {"category": "KEYPADS / FOBS / PANICS", "partNumber": "6160VADT", "description": "Talking Keypad", "qty": 0, "minQty": 1}, {"category": "KEYPADS / FOBS / PANICS", "partNumber": "WS4939", "description": "DSC Keyfob", "qty": 0, "minQty": 1}, {"category": "CONTACTS", "partNumber": "958", "description": "Mini OHD Contact", "qty": 0, "minQty": 2}, {"category": "CONTACTS", "partNumber": "4532CL", "description": "OHD Contact", "qty": 0, "minQty": 2}, {"category": "CONTACTS", "partNumber": "5816WMWH", "description": "D/W w/magnet", "qty": 0, "minQty": 5}, {"category": "CONTACTS", "partNumber": "HONDWA01", "description": "Mini D/W Sensor", "qty": 0, "minQty": 5}, {"category": "CONTACTS", "partNumber": "WS4945", "description": "DSC D/W Contact", "qty": 0, "minQty": 5}, {"category": "MOTIONS / GLASSBREAKS", "partNumber": "5853", "description": "W/L Glassbreak", "qty": 0, "minQty": 1}, {"category": "MOTIONS / GLASSBREAKS", "partNumber": "5800PIR-RES", "description": "W/L Motion Resi", "qty": 0, "minQty": 2}, {"category": "MOTIONS / GLASSBREAKS", "partNumber": "ISC-BDL2-WP12G", "description": "Blue Line Motion", "qty": 0, "minQty": 1}, {"category": "MOTIONS / GLASSBREAKS", "partNumber": "WLS922L-433", "description": "DSC Glassbreak", "qty": 0, "minQty": 1}, {"category": "MOTIONS / GLASSBREAKS", "partNumber": "WS4904P", "description": "DSC Motion", "qty": 0, "minQty": 1}, {"category": "SMOKES / CO / HEATS", "partNumber": "5800COM", "description": "H/W Carbon", "qty": 0, "minQty": 1}, {"category": "SMOKES / CO / HEATS", "partNumber": "5800SMOKEV", "description": "W/L Smoke & Heat", "qty": 0, "minQty": 1}, {"category": "SMOKES / CO / HEATS", "partNumber": "5809SS", "description": "Heat Detector", "qty": 0, "minQty": 1}, {"category": "SMOKES / CO / HEATS", "partNumber": "WS4933", "description": "DSC W/L CO", "qty": 0, "minQty": 1}, {"category": "SMOKES / CO / HEATS", "partNumber": "WS4936", "description": "DSC W/L Smoke", "qty": 0, "minQty": 1}, {"category": "MISC", "partNumber": "85803", "description": "Surge Protector", "qty": 0, "minQty": 1}, {"category": "MISC", "partNumber": "100-TCWG-W", "description": "H/W Surface Contact", "qty": 0, "minQty": 1}, {"category": "MISC", "partNumber": "20RS-T-W", "description": "H/W contact", "qty": 0, "minQty": 1}, {"category": "MISC", "partNumber": "FS3000PCB", "description": "SW3000 Board Only", "qty": 0, "minQty": 1}, {"category": "MISC", "partNumber": "TL-PA7017KIT", "description": "Nano", "qty": 0, "minQty": 1}, {"category": "MISC", "partNumber": "WT4911B", "description": "Outdoor Impassa Siren", "qty": 0, "minQty": 1}, {"category": "CELLGUARD", "partNumber": "LE2077-ADTAT", "description": "Impassa AT&T", "qty": 0, "minQty": 1}, {"category": "CELLGUARD", "partNumber": "LE4000RF-ADTAT", "description": "Back Up AT&T for SW", "qty": 0, "minQty": 1}, {"category": "CELLGUARD", "partNumber": "LTEL3A", "description": "3V AT&T", "qty": 0, "minQty": 1}, {"category": "CELLGUARD", "partNumber": "LTEL5A", "description": "5V AT&T", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "ADT2X16LTE-3", "description": "2 X 16 AIO Panel", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "ADT7AIO-5", "description": "Command Panel", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "ADTCONVERTR-2", "description": "RF to SIXRF Translator", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "ADTLTE-A3", "description": "AT&T Cellguard", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "ADTLTE-V3", "description": "Verizon Cellguard", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "DESKMT-AIO", "description": "Desk Mount AIO Panel", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "DESKMT-WTS", "description": "Desk Charger WTS700", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "EX6120-100NAS", "description": "WiFi Extender", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "MYQ-821LMC-SMC", "description": "MYQ Garage Bundle", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "OC845", "description": "Outdoor Camera", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "RC845", "description": "Indoor Camera", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "SIXC2WA", "description": "HW to W/L Converter", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "SIXCOMBOVA", "description": "Smoke/Heat/CO", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "SIXCOVA", "description": "CO Detector", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "SIXCTA", "description": "Door Contact", "qty": 0, "minQty": 5}, {"category": "COMMAND", "partNumber": "SIXFOB2A", "description": "Keyfob", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "SIXGBA", "description": "Glassbreak", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "SIXPANICA", "description": "Panic Button", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "SIXPIRA", "description": "Motion", "qty": 0, "minQty": 2}, {"category": "COMMAND", "partNumber": "SIXRPTRA", "description": "Repeater", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "SIXSHOCK2A", "description": "D/W Contact Shock", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "SIXSIREN", "description": "Indoor / Outdoor Siren", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "SIXSMOKEV", "description": "Smoke Detector", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "PROWLTOUCHWA", "description": "Wall Mount for WTS700", "qty": 0, "minQty": 1}, {"category": "COMMAND", "partNumber": "WTS700", "description": "7 inch Touchscreen", "qty": 0, "minQty": 1}, {"category": "GOOGLE", "partNumber": "86733", "description": "Power Supply Kit", "qty": 0, "minQty": 1}, {"category": "GOOGLE", "partNumber": "GA00551-US", "description": "GEN 4 Tstat", "qty": 0, "minQty": 1}, {"category": "GOOGLE", "partNumber": "GA01317-US", "description": "Outdoor Camera", "qty": 0, "minQty": 1}, {"category": "GOOGLE", "partNumber": "GA10919-US", "description": "Wired Outdoor Cam", "qty": 0, "minQty": 1}, {"category": "GOOGLE", "partNumber": "GA01318-US", "description": "White Doorbell", "qty": 0, "minQty": 1}, {"category": "GOOGLE", "partNumber": "GA09967-US", "description": "Nest Hub Charcoal", "qty": 0, "minQty": 1}, {"category": "GOOGLE", "partNumber": "GA01334-US", "description": "Nest Thermostat", "qty": 0, "minQty": 1}, {"category": "GOOGLE", "partNumber": "GA01420-US", "description": "Nest Audio", "qty": 0, "minQty": 1}, {"category": "GOOGLE", "partNumber": "GA01837-US", "description": "Thermostat Trim Kit", "qty": 0, "minQty": 1}, {"category": "GOOGLE", "partNumber": "GA01998-US", "description": "Indoor Camera", "qty": 0, "minQty": 1}, {"category": "GOOGLE", "partNumber": "GA09973-US", "description": "Wired Indoor Cam", "qty": 0, "minQty": 1}, {"category": "GOOGLE", "partNumber": "GA02076-US", "description": "Gray Doorbell", "qty": 0, "minQty": 1}, {"category": "GOOGLE", "partNumber": "GA09968-US", "description": "Wired Gray DB", "qty": 0, "minQty": 1}, {"category": "GOOGLE", "partNumber": "GA02411-US", "description": "Floodlight", "qty": 0, "minQty": 1}, {"category": "V5", "partNumber": "DWCOVER-SR", "description": "D/W Sensor Magnet Color Cover", "qty": 0, "minQty": 1}, {"category": "V5", "partNumber": "DWSHIM-SR", "description": "D/W Sensor Spacer", "qty": 0, "minQty": 1}, {"category": "V5", "partNumber": "S501R0-01-WH-V5.3", "description": "V5 Base", "qty": 0, "minQty": 1}, {"category": "V5", "partNumber": "SAHSR0-29-WH", "description": "Indoor Siren", "qty": 0, "minQty": 1}, {"category": "V5", "partNumber": "SKF3R0-29-WH", "description": "Key Fob", "qty": 0, "minQty": 1}, {"category": "V5", "partNumber": "SSGB5R0-29-WH", "description": "Glassbreak Sensor", "qty": 0, "minQty": 1}, {"category": "V5", "partNumber": "SSMSR0-29-WH", "description": "Motion Sensor", "qty": 0, "minQty": 1}, {"category": "V5", "partNumber": "SSSSR0-29-WH", "description": "Smoke Heat Detector", "qty": 0, "minQty": 1}, {"category": "NIGHTHAWK", "partNumber": "MR70S-1ADNAS", "description": "Nighthawk Mesh Router", "qty": 0, "minQty": 1}, {"category": "NIGHTHAWK", "partNumber": "MS70-1ADNAS", "description": "Nighthawk Mesh Satellite", "qty": 0, "minQty": 1}];
+let parts = JSON.parse(localStorage.getItem('tti_parts') || JSON.stringify(defaultParts));
+let jobs = JSON.parse(localStorage.getItem('tti_jobs') || '[]');
+
+function save(){ localStorage.setItem('tti_parts', JSON.stringify(parts)); localStorage.setItem('tti_jobs', JSON.stringify(jobs)); }
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('nav-'+id).classList.add('active');
+  renderAll();
+}
+function init(){
+  const cats=[...new Set(parts.map(p=>p.category))].sort();
+  const cat=document.getElementById('catFilter');
+  cats.forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;cat.appendChild(o);});
+  renderAll();
+}
+function renderAll(){ renderStats(); renderInventory(); renderPartSelect(); renderJobs(); renderAlerts(); }
+function renderStats(){
+  document.getElementById('totalParts').textContent = parts.length;
+  document.getElementById('lowCount').textContent = parts.filter(p=>Number(p.qty)<=Number(p.minQty)).length;
+  document.getElementById('jobCount').textContent = jobs.length;
+  document.getElementById('usedCount').textContent = jobs.reduce((a,j)=>a+Number(j.qtyUsed||0),0);
+}
+function renderInventory(){
+  const q=(document.getElementById('search')?.value||'').toLowerCase();
+  const c=document.getElementById('catFilter')?.value||'';
+  const list=document.getElementById('inventoryList');
+  list.innerHTML='';
+  parts.filter(p=>(!c||p.category===c)&&(p.partNumber.toLowerCase().includes(q)||p.description.toLowerCase().includes(q))).forEach((p,i)=>{
+    const realIndex=parts.indexOf(p);
+    const div=document.createElement('div');
+    div.className='card';
+    div.innerHTML=`<div class="item"><div><b>${p.partNumber}</b><div class="small">${p.description}</div><div class="small">${p.category}</div></div><span class="badge ${Number(p.qty)<=Number(p.minQty)?'low':'ok'}">Qty: ${p.qty}</span></div>
+    <div class="qtybox"><button onclick="changeQty(${realIndex},-1)">-</button><input type="number" value="${p.qty}" onchange="setQty(${realIndex},this.value)"><button onclick="changeQty(${realIndex},1)">+</button></div>
+    <label>Min Qty</label><input type="number" value="${p.minQty}" onchange="setMin(${realIndex},this.value)">`;
+    list.appendChild(div);
+  });
+}
+function changeQty(i,delta){ parts[i].qty=Math.max(0,Number(parts[i].qty)+delta); save(); renderAll(); }
+function setQty(i,val){ parts[i].qty=Math.max(0,Number(val)||0); save(); renderAll(); }
+function setMin(i,val){ parts[i].minQty=Math.max(0,Number(val)||0); save(); renderAll(); }
+function renderPartSelect(){
+  const sel=document.getElementById('partSelect');
+  sel.innerHTML='';
+  parts.forEach((p,i)=>{let o=document.createElement('option');o.value=i;o.textContent=`${p.partNumber} - ${p.description} (Qty ${p.qty})`;sel.appendChild(o);});
+}
+function addPartUsed(){
+  const jobNumber=document.getElementById('jobNumber').value.trim();
+  if(!jobNumber){alert('Enter a job number first.');return;}
+  const i=Number(document.getElementById('partSelect').value);
+  const qty=Number(document.getElementById('qtyUsed').value)||1;
+  if(qty<1){alert('Quantity must be at least 1.');return;}
+  const p=parts[i];
+  p.qty=Math.max(0,Number(p.qty)-qty);
+  jobs.unshift({date:new Date().toLocaleString(), jobNumber, customer:document.getElementById('customer').value.trim(), jobType:document.getElementById('jobType').value, partNumber:p.partNumber, description:p.description, qtyUsed:qty});
+  document.getElementById('qtyUsed').value=1;
+  save(); renderAll();
+  alert('Part used saved and inventory deducted.');
+}
+function renderJobs(){
+  const list=document.getElementById('recentJobs');
+  list.innerHTML='';
+  jobs.slice(0,20).forEach(j=>{
+    const div=document.createElement('div');div.className='item';
+    div.innerHTML=`<div><b>Job #${j.jobNumber}</b><div class="small">${j.partNumber} - ${j.description}</div><div class="small">${j.date} • ${j.jobType} ${j.customer?'• '+j.customer:''}</div></div><span class="badge">Used ${j.qtyUsed}</span>`;
+    list.appendChild(div);
+  });
+}
+function renderAlerts(){
+  const low=parts.filter(p=>Number(p.qty)<=Number(p.minQty));
+  const fill=(el)=>{el.innerHTML=''; if(low.length===0) el.innerHTML='<div class="small">No low inventory right now.</div>'; low.forEach(p=>{let d=document.createElement('div');d.className='item';d.innerHTML=`<div><b>${p.partNumber}</b><div class="small">${p.description}</div></div><span class="badge low">Qty ${p.qty} / Min ${p.minQty}</span>`; el.appendChild(d);});};
+  fill(document.getElementById('alertList'));
+  fill(document.getElementById('homeLowList'));
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify({parts,jobs},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tech_inventory_backup.json';a.click();
+}
+function resetApp(){
+  if(confirm('Reset all app data back to starter list?')){localStorage.removeItem('tti_parts');localStorage.removeItem('tti_jobs');location.reload();}
+}
+init();
+</script>
+</body>
+</html>
