@@ -222,18 +222,113 @@ function renderPartSelect(){
   sel.innerHTML='';
   parts.forEach((p,i)=>{let o=document.createElement('option');o.value=i;o.textContent=`${p.partNumber} - ${p.description} (Qty ${p.qty})`;sel.appendChild(o);});
 }
+let currentJobParts = [];
+
 function addPartUsed(){
+
   const jobNumber=document.getElementById('jobNumber').value.trim();
-  if(!jobNumber){alert('Enter a job number first.');return;}
+
+  if(!jobNumber){
+    alert('Enter a job number first.');
+    return;
+  }
+
   const i=Number(document.getElementById('partSelect').value);
   const qty=Number(document.getElementById('qtyUsed').value)||1;
-  if(qty<1){alert('Quantity must be at least 1.');return;}
+
+  if(qty<1){
+    alert('Quantity must be at least 1.');
+    return;
+  }
+
   const p=parts[i];
-  p.qty=Math.max(0,Number(p.qty)-qty);
-  jobs.unshift({date:new Date().toLocaleString(), jobNumber, customer:document.getElementById('customer').value.trim(), jobType:document.getElementById('jobType').value, partNumber:p.partNumber, description:p.description, qtyUsed:qty});
-  document.getElementById('qtyUsed').value=1;
-  save(); renderAll();
-  alert('Part used saved and inventory deducted.');
+
+  currentJobParts.push({
+    index:i,
+    partNumber:p.partNumber,
+    description:p.description,
+    qtyUsed:qty
+  });
+
+  alert(`${p.partNumber} added to job list.`);
+
+  renderCurrentJobParts();
+}
+
+function renderCurrentJobParts(){
+
+  let box=document.getElementById('currentJobParts');
+
+  if(!box){
+    box=document.createElement('div');
+    box.id='currentJobParts';
+    document.querySelector('#job .card').appendChild(box);
+  }
+
+  box.innerHTML='<h2>Current Job Parts</h2>';
+
+  currentJobParts.forEach((p,idx)=>{
+
+    let div=document.createElement('div');
+
+    div.className='item';
+
+    div.innerHTML=`
+      <div>
+        <b>${p.partNumber}</b>
+        <div class="small">${p.description}</div>
+      </div>
+      <span class="badge">${p.qtyUsed}</span>
+    `;
+
+    box.appendChild(div);
+
+  });
+
+  let finishBtn=document.createElement('button');
+
+  finishBtn.className='btn good';
+
+  finishBtn.textContent='Finish Job & Deduct Inventory';
+
+  finishBtn.onclick=finishJob;
+
+  box.appendChild(finishBtn);
+}
+
+function finishJob(){
+
+  const jobNumber=document.getElementById('jobNumber').value.trim();
+
+  currentJobParts.forEach(j=>{
+
+    parts[j.index].qty=Math.max(
+      0,
+      Number(parts[j.index].qty)-Number(j.qtyUsed)
+    );
+
+    jobs.unshift({
+      date:new Date().toLocaleString(),
+      jobNumber,
+      customer:document.getElementById('customer').value.trim(),
+      jobType:document.getElementById('jobType').value,
+      partNumber:j.partNumber,
+      description:j.description,
+      qtyUsed:j.qtyUsed
+    });
+
+  });
+
+  currentJobParts=[];
+
+  save();
+
+  renderAll();
+
+  document.getElementById('currentJobParts').innerHTML='';
+
+  alert('Job completed and inventory deducted.');
+
 }
 function renderJobs(){
   const list=document.getElementById('recentJobs');
