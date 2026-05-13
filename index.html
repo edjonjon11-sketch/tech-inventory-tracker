@@ -85,7 +85,39 @@ h2{font-size:19px;margin:8px 0 4px}
   <button class="btn danger" onclick="resetApp()">Reset App Data</button>
 </section>
 
+  <section id="summary" class="screen">
+  <h2>Inventory Summary</h2>
+
+  <div class="grid">
+    <div class="card">
+      <div class="small">Total Inventory Qty</div>
+      <div id="sumTotalQty" class="stat">0</div>
+    </div>
+
+    <div class="card">
+      <div class="small">Low Stock Items</div>
+      <div id="sumLowStock" class="stat">0</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Inventory By Category</h2>
+    <div id="categorySummary"></div>
+  </div>
+
+  <div class="card">
+    <h2>Highest Inventory</h2>
+    <div id="topInventory"></div>
+  </div>
+
+  <div class="card">
+    <h2>Lowest Inventory</h2>
+    <div id="lowInventory"></div>
+  </div>
+</section>
+
 <nav>
+  <button id="nav-summary" onclick="showScreen('summary')">Summary</button>
   <button id="nav-home" class="active" onclick="showScreen('home')">Home</button>
   <button id="nav-inventory" onclick="showScreen('inventory')">Inventory</button>
   <button id="nav-job" onclick="showScreen('job')">Job</button>
@@ -160,7 +192,7 @@ function init(){
   cats.forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;cat.appendChild(o);});
   renderAll();
 }
-function renderAll(){ renderStats(); renderInventory(); renderPartSelect(); renderJobs(); renderAlerts(); }
+function renderAll(){ renderStats(); renderInventory(); renderPartSelect(); renderJobs(); renderAlerts();renderSummary(); }
 function renderStats(){
   document.getElementById('totalParts').textContent = parts.length;
   document.getElementById('lowCount').textContent = parts.filter(p=>Number(p.qty)<=Number(p.minQty)).length;
@@ -221,6 +253,55 @@ function renderAlerts(){
 function exportData(){
   const blob=new Blob([JSON.stringify({parts,jobs},null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tech_inventory_backup.json';a.click();
+}
+
+  function renderSummary(){
+
+  const totalQty = parts.reduce((a,p)=>a+Number(p.qty||0),0);
+  document.getElementById('sumTotalQty').textContent = totalQty;
+
+  const lowStock = parts.filter(p=>Number(p.qty)<=Number(p.minQty));
+  document.getElementById('sumLowStock').textContent = lowStock.length;
+
+  const catBox=document.getElementById('categorySummary');
+  catBox.innerHTML='';
+
+  const cats={};
+
+  parts.forEach(p=>{
+    if(!cats[p.category]) cats[p.category]=0;
+    cats[p.category]+=Number(p.qty||0);
+  });
+
+  Object.keys(cats).sort().forEach(c=>{
+    let d=document.createElement('div');
+    d.className='item';
+    d.innerHTML=`<div><b>${c}</b></div><span class="badge ok">${cats[c]}</span>`;
+    catBox.appendChild(d);
+  });
+
+  const top=[...parts].sort((a,b)=>b.qty-a.qty).slice(0,5);
+  const topBox=document.getElementById('topInventory');
+  topBox.innerHTML='';
+
+  top.forEach(p=>{
+    let d=document.createElement('div');
+    d.className='item';
+    d.innerHTML=`<div><b>${p.partNumber}</b><div class="small">${p.description}</div></div><span class="badge ok">${p.qty}</span>`;
+    topBox.appendChild(d);
+  });
+
+  const low=[...parts].sort((a,b)=>a.qty-b.qty).slice(0,5);
+  const lowBox=document.getElementById('lowInventory');
+  lowBox.innerHTML='';
+
+  low.forEach(p=>{
+    let d=document.createElement('div');
+    d.className='item';
+    d.innerHTML=`<div><b>${p.partNumber}</b><div class="small">${p.description}</div></div><span class="badge low">${p.qty}</span>`;
+    lowBox.appendChild(d);
+  });
+
 }
 function resetApp(){
   if(confirm('Reset all app data back to starter list?')){localStorage.removeItem('tti_parts');localStorage.removeItem('tti_jobs');location.reload();}
