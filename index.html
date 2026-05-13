@@ -385,14 +385,45 @@ function renderJobs(){
       ${partsHTML}
 
       <div class="item">
-        <b>Total Parts Used</b>
-        <span class="badge ok">${totalQty}</span>
-      </div>
+  <b>Total Parts Used</b>
+  <span class="badge ok">${totalQty}</span>
+</div>
+
+<button class="btn danger" onclick="deleteJob('${jobNum}')">
+  Delete Job
+</button>
     `;
 
     list.appendChild(card);
 
   });
+
+}
+  function deleteJob(jobNumber){
+
+  if(!confirm(`Delete Job #${jobNumber}?`)){
+    return;
+  }
+
+  const removedJobs = jobs.filter(j=>j.jobNumber===jobNumber);
+
+  removedJobs.forEach(j=>{
+
+    const part = parts.find(p=>p.partNumber===j.partNumber);
+
+    if(part){
+      part.qty = Number(part.qty) + Number(j.qtyUsed);
+    }
+
+  });
+
+  jobs = jobs.filter(j=>j.jobNumber!==jobNumber);
+
+  save();
+
+  renderAll();
+
+  alert(`Job #${jobNumber} deleted and inventory restored.`);
 
 }
 function renderAlerts(){
