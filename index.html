@@ -331,13 +331,69 @@ function finishJob(){
 
 }
 function renderJobs(){
+
   const list=document.getElementById('recentJobs');
+
   list.innerHTML='';
-  jobs.slice(0,20).forEach(j=>{
-    const div=document.createElement('div');div.className='item';
-    div.innerHTML=`<div><b>Job #${j.jobNumber}</b><div class="small">${j.partNumber} - ${j.description}</div><div class="small">${j.date} • ${j.jobType} ${j.customer?'• '+j.customer:''}</div></div><span class="badge">Used ${j.qtyUsed}</span>`;
-    list.appendChild(div);
+
+  const grouped={};
+
+  jobs.forEach(j=>{
+
+    if(!grouped[j.jobNumber]){
+      grouped[j.jobNumber]=[];
+    }
+
+    grouped[j.jobNumber].push(j);
+
   });
+
+  Object.keys(grouped).forEach(jobNum=>{
+
+    const jobItems=grouped[jobNum];
+
+    const card=document.createElement('div');
+
+    card.className='card';
+
+    let partsHTML='';
+
+    let totalQty=0;
+
+    jobItems.forEach(j=>{
+
+      totalQty+=Number(j.qtyUsed||0);
+
+      partsHTML+=`
+        <div class="item">
+          <div>
+            <b>${j.partNumber}</b>
+            <div class="small">${j.description}</div>
+          </div>
+          <span class="badge">Used ${j.qtyUsed}</span>
+        </div>
+      `;
+
+    });
+
+    card.innerHTML=`
+      <h2>Job #${jobNum}</h2>
+      <div class="small">
+        ${jobItems[0].date} • ${jobItems[0].jobType}
+      </div>
+
+      ${partsHTML}
+
+      <div class="item">
+        <b>Total Parts Used</b>
+        <span class="badge ok">${totalQty}</span>
+      </div>
+    `;
+
+    list.appendChild(card);
+
+  });
+
 }
 function renderAlerts(){
   const low=parts.filter(p=>Number(p.qty)<=Number(p.minQty));
