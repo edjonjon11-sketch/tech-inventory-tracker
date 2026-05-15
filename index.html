@@ -491,6 +491,89 @@ function exportData(){
 function resetApp(){
   if(confirm('Reset all app data back to starter list?')){localStorage.removeItem('tti_parts');localStorage.removeItem('tti_jobs');location.reload();}
 }
+ function emailReport(){
+
+  let inventoryText = '';
+  let lowText = '';
+  let jobsText = '';
+
+  parts.forEach(p=>{
+
+    inventoryText +=
+`${p.partNumber}
+${p.description}
+Qty: ${p.qty}
+
+`;
+
+    if(Number(p.qty) <= Number(p.minQty)){
+
+      lowText +=
+`${p.partNumber} - Qty ${p.qty}
+`;
+
+    }
+
+  });
+
+  const groupedJobs = {};
+
+  jobs.forEach(j=>{
+
+    if(!groupedJobs[j.jobNumber]){
+      groupedJobs[j.jobNumber] = [];
+    }
+
+    groupedJobs[j.jobNumber].push(j);
+
+  });
+
+  Object.keys(groupedJobs).forEach(jobNum=>{
+
+    jobsText += `
+JOB #${jobNum}
+-------------------
+`;
+
+    groupedJobs[jobNum].forEach(j=>{
+
+      jobsText +=
+`${j.partNumber}
+${j.description}
+Used: ${j.qtyUsed}
+
+`;
+
+    });
+
+  });
+
+  const body =
+`TECH INVENTORY REPORT
+
+========================
+LOW INVENTORY ALERTS
+========================
+
+${lowText || 'No low inventory'}
+
+========================
+CURRENT INVENTORY
+========================
+
+${inventoryText}
+
+========================
+JOB HISTORY
+========================
+
+${jobsText}
+`;
+
+  window.location.href =
+`mailto:?subject=Tech Inventory Report&body=${encodeURIComponent(body)}`;
+
+} 
 init();
 </script>
 </body>
