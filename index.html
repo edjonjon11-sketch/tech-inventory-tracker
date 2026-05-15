@@ -442,7 +442,8 @@ renderTransfers(); }
 function renderStats(){
   document.getElementById('totalParts').textContent = parts.length;
   document.getElementById('lowCount').textContent = parts.filter(p=>Number(p.qty)<=Number(p.minQty)).length;
-  document.getElementById('jobCount').textContent = jobs.length;
+  document.getElementById('jobCount').textContent =
+new Set(jobs.map(j=>j.jobNumber)).size;
   document.getElementById('usedCount').textContent = jobs.reduce((a,j)=>a+Number(j.qtyUsed||0),0);
 }
 function renderInventory(){
