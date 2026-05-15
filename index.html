@@ -302,12 +302,33 @@ function renderTransfers(){
 
     d.innerHTML=
 `
+d.innerHTML=`
 <div>
-<b>${t.partNumber}</b>
-<div class="small">${t.description}</div>
-<div class="small">
-${t.from} → ${t.to}
+  <b>${t.partNumber}</b>
+
+  <div class="small">
+    ${t.description}
+  </div>
+
+  <div class="small">
+    ${t.from} → ${t.to}
+  </div>
+
+  <div class="small">
+    Qty: ${t.qty}
+  </div>
+
+  <div class="small">
+    ${t.date}
+  </div>
 </div>
+
+<button class="btn danger"
+onclick="deleteTransfer(${i})"
+style="width:auto;padding:8px 12px;">
+  Delete
+</button>
+`;
 <div class="small">${t.date}</div>
 </div>
 
@@ -396,6 +417,20 @@ ${text}
 
   window.location.href =
 `mailto:?subject=Truck Transfer Report&body=${encodeURIComponent(body)}`;
+
+}
+
+function deleteTransfer(i){
+
+  if(!confirm(
+    'Delete this transfer?'
+  )) return;
+
+  transfers.splice(i,1);
+
+  save();
+
+  renderAll();
 
 }
   
