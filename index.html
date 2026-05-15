@@ -371,7 +371,7 @@ function renderJobs(){
         <div class="item">
           <div>
             <b>${j.partNumber}</b>
-            <div class="small">${j.description}</div>
+            <div class="small">Tech: ${j.techName || 'Unknown'}</div>
           </div>
           <span class="badge">Used ${j.qtyUsed}</span>
         </div>
