@@ -104,6 +104,11 @@ h2{font-size:19px;margin:8px 0 4px}
   <div class="card">
     <h2>Transfer History</h2>
     <div id="transferHistory"></div>
+
+    <button class="btn good" onclick="emailTransfers()">
+  Email Transfer Report
+</button>
+    
   </div>
 </section>
   
@@ -337,6 +342,60 @@ function deleteJob(jobNum){
   save();
 
   renderJobs();
+
+}
+
+function emailTransfers(){
+
+  let text='';
+
+  if(transfers.length===0){
+
+    text='No transfer history available.';
+
+  } else {
+
+    transfers.forEach(t=>{
+
+      text +=
+`
+PART:
+${t.partNumber}
+
+DESCRIPTION:
+${t.description}
+
+QTY:
+${t.qty}
+
+FROM:
+${t.from}
+
+TO:
+${t.to}
+
+DATE:
+${t.date}
+
+----------------------------
+
+`;
+
+    });
+
+  }
+
+  const body =
+`
+TRUCK TRANSFER REPORT
+
+======================
+
+${text}
+`;
+
+  window.location.href =
+`mailto:?subject=Truck Transfer Report&body=${encodeURIComponent(body)}`;
 
 }
   
