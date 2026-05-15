@@ -294,16 +294,16 @@ function renderTransfers(){
 
   box.innerHTML='';
 
-  transfers.forEach(t=>{
+  transfers.forEach((t,i)=>{
 
     let d=document.createElement('div');
 
     d.className='item';
 
-    d.innerHTML=
-`
-d.innerHTML=`
+    d.innerHTML=`
+
 <div>
+
   <b>${t.partNumber}</b>
 
   <div class="small">
@@ -321,20 +321,17 @@ d.innerHTML=`
   <div class="small">
     ${t.date}
   </div>
+
 </div>
 
 <button class="btn danger"
 onclick="deleteTransfer(${i})"
 style="width:auto;padding:8px 12px;">
-  Delete
-</button>
-`;
-<div class="small">${t.date}</div>
-</div>
 
-<span class="badge">
-${t.qty}
-</span>
+Delete
+
+</button>
+
 `;
 
     box.appendChild(d);
