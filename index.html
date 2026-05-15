@@ -78,6 +78,35 @@ h2{font-size:19px;margin:8px 0 4px}
   <div class="card"><h2>Recent Job Usage</h2><div id="recentJobs"></div></div>
 </section>
 
+<section id="transfers" class="screen">
+  <h2>Truck Transfers</h2>
+
+  <div class="card">
+
+    <label>From Tech</label>
+    <input id="transferFrom">
+
+    <label>To Tech</label>
+    <input id="transferTo">
+
+    <label>Part</label>
+    <select id="transferPart"></select>
+
+    <label>Qty</label>
+    <input id="transferQty" type="number" value="1">
+
+    <button class="btn good" onclick="saveTransfer()">
+      Save Transfer
+    </button>
+
+  </div>
+
+  <div class="card">
+    <h2>Transfer History</h2>
+    <div id="transferHistory"></div>
+  </div>
+</section>
+  
 <section id="alerts" class="screen">
   <h2>Low Inventory</h2>
   <div id="alertList"></div>
@@ -125,6 +154,9 @@ h2{font-size:19px;margin:8px 0 4px}
   <button id="nav-inventory" onclick="showScreen('inventory')">Inventory</button>
   <button id="nav-job" onclick="showScreen('job')">Job</button>
   <button id="nav-alerts" onclick="showScreen('alerts')">Alerts</button>
+  <button id="nav-transfers" onclick="showScreen('transfers')">
+Transfers
+</button>
 </nav>
 
 <script>
@@ -180,8 +212,13 @@ const defaultParts = [
 ];
 let parts = JSON.parse(localStorage.getItem('tti_parts') || JSON.stringify(defaultParts))
 let jobs = JSON.parse(localStorage.getItem('tti_jobs') || '[]');
+let transfers = JSON.parse(localStorage.getItem('tti_transfers') || '[]');
 
-function save(){ localStorage.setItem('tti_parts', JSON.stringify(parts)); localStorage.setItem('tti_jobs', JSON.stringify(jobs)); }
+function save(){
+  localStorage.setItem('tti_parts', JSON.stringify(parts));
+  localStorage.setItem('tti_jobs', JSON.stringify(jobs));
+  localStorage.setItem('tti_transfers', JSON.stringify(transfers));
+}
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -189,13 +226,128 @@ function showScreen(id){
   document.getElementById('nav-'+id).classList.add('active');
   renderAll();
 }
+function renderTransferParts(){
+
+  const sel=document.getElementById('transferPart');
+
+  if(!sel) return;
+
+  sel.innerHTML='';
+
+  parts.forEach((p,i)=>{
+
+    let o=document.createElement('option');
+
+    o.value=i;
+
+    o.textContent=
+`${p.partNumber} - ${p.description} (Qty ${p.qty})`;
+
+    sel.appendChild(o);
+
+  });
+
+}
+
+function saveTransfer(){
+
+  const i=Number(document.getElementById('transferPart').value);
+
+  const qty=Number(document.getElementById('transferQty').value)||1;
+
+  const p=parts[i];
+
+  transfers.unshift({
+
+    date:new Date().toLocaleString(),
+
+    from:document.getElementById('transferFrom').value,
+
+    to:document.getElementById('transferTo').value,
+
+    partNumber:p.partNumber,
+
+    description:p.description,
+
+    qty
+
+  });
+
+  save();
+
+  renderTransfers();
+
+  alert('Transfer saved.');
+
+}
+
+function renderTransfers(){
+
+  const box=document.getElementById('transferHistory');
+
+  if(!box) return;
+
+  box.innerHTML='';
+
+  transfers.forEach(t=>{
+
+    let d=document.createElement('div');
+
+    d.className='item';
+
+    d.innerHTML=
+`
+<div>
+<b>${t.partNumber}</b>
+<div class="small">${t.description}</div>
+<div class="small">
+${t.from} → ${t.to}
+</div>
+<div class="small">${t.date}</div>
+</div>
+
+<span class="badge">
+${t.qty}
+</span>
+`;
+
+    box.appendChild(d);
+
+  });
+
+}
+
+function toggleJob(jobNum){
+
+  const box=document.getElementById('job-'+jobNum);
+
+  box.style.display =
+box.style.display==='none'
+? 'block'
+: 'none';
+
+}
+
+function deleteJob(jobNum){
+
+  if(!confirm('Delete this entire job history?')) return;
+
+  jobs = jobs.filter(j=>j.jobNumber !== jobNum);
+
+  save();
+
+  renderJobs();
+
+}
+  
 function init(){
   const cats=[...new Set(parts.map(p=>p.category))].sort();
   const cat=document.getElementById('catFilter');
   cats.forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;cat.appendChild(o);});
   renderAll();
 }
-function renderAll(){ renderStats(); renderInventory(); renderPartSelect(); renderJobs(); renderAlerts();renderSummary(); }
+function renderAll(){ renderStats(); renderInventory(); renderPartSelect(); renderJobs(); renderAlerts();renderSummary(); renderTransferParts();
+renderTransfers(); }
 function renderStats(){
   document.getElementById('totalParts').textContent = parts.length;
   document.getElementById('lowCount').textContent = parts.filter(p=>Number(p.qty)<=Number(p.minQty)).length;
@@ -353,51 +505,71 @@ function renderJobs(){
 
   Object.keys(grouped).forEach(jobNum=>{
 
-    const jobItems=grouped[jobNum];
+    const items=grouped[jobNum];
 
-    const card=document.createElement('div');
-
-    card.className='card';
+    const first=items[0];
 
     let partsHTML='';
 
-    let totalQty=0;
+    items.forEach(j=>{
 
-    jobItems.forEach(j=>{
+      partsHTML +=
+`
+<div class="item">
+<div>
+<b>${j.partNumber}</b>
+<div class="small">${j.description}</div>
+</div>
 
-      totalQty+=Number(j.qtyUsed||0);
-
-      partsHTML+=`
-        <div class="item">
-          <div>
-            <b>${j.partNumber}</b>
-            <div class="small">Tech: ${j.techName || 'Unknown'}</div>
-          </div>
-          <span class="badge">Used ${j.qtyUsed}</span>
-        </div>
-      `;
+<span class="badge">
+${j.qtyUsed}
+</span>
+</div>
+`;
 
     });
 
-    card.innerHTML=`
-      <h2>Job #${jobNum}</h2>
-      <div class="small">
-        ${jobItems[0].date} • ${jobItems[0].jobType}
-      </div>
+    const div=document.createElement('div');
 
-      ${partsHTML}
+    div.className='card';
 
-      <div class="item">
-  <b>Total Parts Used</b>
-  <span class="badge ok">${totalQty}</span>
+    div.innerHTML=
+`
+<div onclick="toggleJob('${jobNum}')"
+style="cursor:pointer;">
+
+<b>Job #${jobNum}</b>
+
+<div class="small">
+${first.date}
 </div>
 
-<button class="btn danger" onclick="deleteJob('${jobNum}')">
-  Delete Job
-</button>
-    `;
+<div class="small">
+Tech: ${first.techName || 'Unknown'}
+</div>
 
-    list.appendChild(card);
+<div class="small">
+Tap To Expand
+</div>
+
+</div>
+
+<div id="job-${jobNum}"
+style="display:none;margin-top:12px;">
+
+${partsHTML}
+
+<button class="btn danger"
+onclick="deleteJob('${jobNum}')">
+
+Delete Job
+
+</button>
+
+</div>
+`;
+
+    list.appendChild(div);
 
   });
 
