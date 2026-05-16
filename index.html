@@ -78,7 +78,51 @@ h2{font-size:19px;margin:8px 0 4px}
     <div id="homeLowList"></div>
 
   </div>
+<div class="card">
 
+<div
+onclick="toggleRecon()"
+style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+cursor:pointer;">
+
+<h2 style="margin:0;">
+Inventory Reconciliation
+</h2>
+
+<span id="reconArrow">
+▼
+</span>
+
+</div>
+
+<div
+id="reconDropdown"
+style="display:none;margin-top:12px;">
+
+<label>
+Upload Actual Inventory Screenshot
+</label>
+
+<input
+type="file"
+id="actualInventoryImage"
+accept="image/*">
+
+<button
+class="btn good"
+onclick="scanActualInventory()">
+Scan Actual Inventory
+</button>
+
+<div id="reconResults"></div>
+
+</div>
+
+</div>
+    
 </div>
 </section>
 
@@ -257,7 +301,7 @@ const defaultParts = [
 let parts = JSON.parse(localStorage.getItem('tti_parts') || JSON.stringify(defaultParts))
 let jobs = JSON.parse(localStorage.getItem('tti_jobs') || '[]');
 let transfers = JSON.parse(localStorage.getItem('tti_transfers') || '[]');
-
+let actualInventory = [];
 function save(){
   localStorage.setItem('tti_parts', JSON.stringify(parts));
   localStorage.setItem('tti_jobs', JSON.stringify(jobs));
@@ -619,6 +663,150 @@ document.getElementById('lowAlertArrow');
     arrow.textContent='▼';
 
   }
+
+}
+  function toggleRecon(){
+
+const box =
+document.getElementById(
+'reconDropdown'
+);
+
+const arrow =
+document.getElementById(
+'reconArrow'
+);
+
+if(box.style.display==='none'){
+
+box.style.display='block';
+
+arrow.textContent='▲';
+
+}else{
+
+box.style.display='none';
+
+arrow.textContent='▼';
+
+}
+
+}
+  async function scanActualInventory(){
+
+const file =
+document.getElementById(
+'actualInventoryImage'
+).files[0];
+
+if(!file){
+
+alert('Choose image first.');
+
+return;
+
+}
+
+alert('Scanning actual inventory...');
+
+const result =
+await Tesseract.recognize(
+file,
+'eng'
+);
+
+const text = result.data.text;
+
+const lines = text.split('\n');
+
+actualInventory = [];
+
+lines.forEach(line=>{
+
+const match =
+line.match(/([A-Z0-9\-]+)\s+(\d+)/);
+
+if(match){
+
+actualInventory.push({
+
+partNumber:match[1],
+
+qty:Number(match[2])
+
+});
+
+}
+
+});
+
+compareInventory();
+
+}
+  function compareInventory(){
+
+const box =
+document.getElementById(
+'reconResults'
+);
+
+box.innerHTML='';
+
+parts.forEach(p=>{
+
+const found =
+actualInventory.find(
+a=>a.partNumber===p.partNumber
+);
+
+const actualQty =
+found ? found.qty : 0;
+
+const diff =
+actualQty - Number(p.qty);
+
+if(diff !== 0){
+
+let d =
+document.createElement('div');
+
+d.className='item';
+
+d.innerHTML=
+`
+<div>
+
+<b>${p.partNumber}</b>
+
+<div class="small">
+Expected: ${p.qty}
+</div>
+
+<div class="small">
+Actual: ${actualQty}
+</div>
+
+</div>
+
+<span class="badge ${diff<0?'low':'ok'}">
+
+${diff>0?'+':''}${diff}
+
+</span>
+`;
+
+box.appendChild(d);
+
+}
+
+});
+
+if(box.innerHTML===''){
+
+box.innerHTML=
+'<div class="small">Inventory matches perfectly.</div>';
+
+}
 
 }
 function init(){
