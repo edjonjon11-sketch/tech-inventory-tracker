@@ -430,6 +430,57 @@ function deleteTransfer(i){
   renderAll();
 
 }
+
+  function editJobPart(jobNum, partNumber){
+
+  const job = jobs.find(
+    j=>j.jobNumber===jobNum &&
+    j.partNumber===partNumber
+  );
+
+  if(!job) return;
+
+  const newQty = prompt(
+    `Edit quantity for ${partNumber}`,
+    job.qtyUsed
+  );
+
+  if(newQty===null) return;
+
+  const qtyNum = Number(newQty);
+
+  if(isNaN(qtyNum) || qtyNum < 0){
+    alert('Invalid quantity');
+    return;
+  }
+
+  const difference =
+    qtyNum - Number(job.qtyUsed);
+
+  const part = parts.find(
+    p=>p.partNumber===partNumber
+  );
+
+  if(part){
+
+    part.qty =
+      Number(part.qty) - difference;
+
+    if(part.qty < 0){
+      part.qty = 0;
+    }
+
+  }
+
+  job.qtyUsed = qtyNum;
+
+  save();
+
+  renderAll();
+
+  alert('Job updated.');
+
+}
   
 function init(){
   const cats=[...new Set(parts.map(p=>p.category))].sort();
@@ -623,9 +674,22 @@ function renderJobs(){
 
   </div>
 
-  <span class="badge">
-    ${j.qtyUsed}
-  </span>
+  <div>
+
+<span class="badge">
+  ${j.qtyUsed}
+</span>
+
+<button
+class="btn secondary"
+style="width:auto;padding:6px 10px;margin-top:6px;"
+onclick="editJobPart('${jobNum}','${j.partNumber}')">
+
+Edit
+
+</button>
+
+</div>
 
 </div>
 `;
