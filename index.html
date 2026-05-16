@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tech Inventory Tracker</title>
+
+  <script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;background:#071423;color:#fff}
@@ -55,6 +57,16 @@ h2{font-size:19px;margin:8px 0 4px}
 
 <section id="inventory" class="screen">
   <h2>Truck Inventory</h2>
+  <input
+type="file"
+id="inventoryImage"
+accept="image/*">
+
+<button
+class="btn good"
+onclick="scanInventoryImage()">
+Scan Inventory Screenshot
+</button>
   <input id="search" placeholder="Search part number or description" oninput="renderInventory()">
   <select id="catFilter" onchange="renderInventory()"><option value="">All Categories</option></select>
   <div id="inventoryList"></div>
@@ -481,7 +493,61 @@ function deleteTransfer(i){
   alert('Job updated.');
 
 }
-  
+
+async function scanInventoryImage(){
+
+  const file =
+document.getElementById('inventoryImage').files[0];
+
+  if(!file){
+    alert('Choose an image first.');
+    return;
+  }
+
+  alert('Scanning image...');
+
+  const result =
+await Tesseract.recognize(
+  file,
+  'eng'
+);
+
+  const text = result.data.text;
+
+  const lines = text.split('\n');
+
+  lines.forEach(line=>{
+
+    const match =
+line.match(/([A-Z0-9\-]+)\s+(\d+)/);
+
+    if(match){
+
+      const partNum = match[1];
+
+      const qty = Number(match[2]);
+
+      const found = parts.find(
+        p=>p.partNumber === partNum
+      );
+
+      if(found){
+
+        found.qty += qty;
+
+      }
+
+    }
+
+  });
+
+  save();
+
+  renderAll();
+
+  alert('Inventory updated from screenshot.');
+
+}
 function init(){
   const cats=[...new Set(parts.map(p=>p.category))].sort();
   const cat=document.getElementById('catFilter');
