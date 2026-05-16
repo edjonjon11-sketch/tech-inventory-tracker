@@ -607,15 +607,28 @@ function renderJobs(){
 
       partsHTML +=
 `
+partsHTML +=
+`
 <div class="item">
+
 <div>
+
 <b>${j.partNumber}</b>
-<div class="small">${j.description}</div>
+
+<div class="small">
+${j.description}
+</div>
+
+<div class="small">
+Date: ${j.date}
+</div>
+
 </div>
 
 <span class="badge">
 ${j.qtyUsed}
 </span>
+
 </div>
 `;
 
@@ -633,7 +646,7 @@ style="cursor:pointer;">
 <b>Job #${jobNum}</b>
 
 <div class="small">
-${first.date}
+Created: ${first.date}
 </div>
 
 <div class="small">
