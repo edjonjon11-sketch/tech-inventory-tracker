@@ -607,27 +607,25 @@ function renderJobs(){
 
       partsHTML +=
 `
-partsHTML +=
-`
 <div class="item">
 
-<div>
+  <div>
 
-<b>${j.partNumber}</b>
+    <b>${j.partNumber}</b>
 
-<div class="small">
-${j.description}
-</div>
+    <div class="small">
+      ${j.description}
+    </div>
 
-<div class="small">
-Date: ${j.date}
-</div>
+    <div class="small">
+      Date: ${j.date}
+    </div>
 
-</div>
+  </div>
 
-<span class="badge">
-${j.qtyUsed}
-</span>
+  <span class="badge">
+    ${j.qtyUsed}
+  </span>
 
 </div>
 `;
@@ -640,36 +638,27 @@ ${j.qtyUsed}
 
     div.innerHTML=
 `
-<div onclick="toggleJob('${jobNum}')"
-style="cursor:pointer;">
+<div onclick="toggleJob('${jobNum}')" style="cursor:pointer;">
 
-<b>Job #${jobNum}</b>
+  <b>Job #${jobNum}</b>
 
-<div class="small">
-Created: ${first.date}
-</div>
+  <div class="small">
+    Created: ${first.date}
+  </div>
 
-<div class="small">
-Tech: ${first.techName || 'Unknown'}
-</div>
-
-<div class="small">
-Tap To Expand
-</div>
+  <div class="small">
+    Tap To Expand
+  </div>
 
 </div>
 
-<div id="job-${jobNum}"
-style="display:none;margin-top:12px;">
+<div id="job-${jobNum}" style="display:none;margin-top:12px;">
 
-${partsHTML}
+  ${partsHTML}
 
-<button class="btn danger"
-onclick="deleteJob('${jobNum}')">
-
-Delete Job
-
-</button>
+  <button class="btn danger" onclick="deleteJob('${jobNum}')">
+    Delete Job
+  </button>
 
 </div>
 `;
