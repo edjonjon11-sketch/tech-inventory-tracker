@@ -52,7 +52,34 @@ h2{font-size:19px;margin:8px 0 4px}
   </div>
   <button class="btn" onclick="showScreen('job')">Start / Log Job</button>
   <button class="btn secondary" onclick="showScreen('inventory')">Update Truck Inventory</button>
-  <div class="card"><h2>Low Inventory Alerts</h2><div id="homeLowList"></div></div>
+  <div class="card">
+
+  <div
+  onclick="toggleLowAlerts()"
+  style="display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;">
+
+    <h2 style="margin:0;">
+      Low Inventory Alerts
+    </h2>
+
+    <span id="lowAlertArrow">
+      ▼
+    </span>
+
+  </div>
+
+  <div
+  id="lowAlertDropdown"
+  style="display:none;margin-top:12px;">
+
+    <div id="homeLowList"></div>
+
+  </div>
+
+</div>
 </section>
 
 <section id="inventory" class="screen">
@@ -546,6 +573,52 @@ line.match(/([A-Z0-9\-]+)\s+(\d+)/);
   renderAll();
 
   alert('Inventory updated from screenshot.');
+
+}
+
+  function toggleLowAlerts(){
+
+  const box =
+document.getElementById('lowAlertDropdown');
+
+  const arrow =
+document.getElementById('lowAlertArrow');
+
+  if(box.style.display==='none'){
+
+    box.style.display='block';
+
+    arrow.textContent='▲';
+
+  } else {
+
+    box.style.display='none';
+
+    arrow.textContent='▼';
+
+  }
+
+}function toggleLowAlerts(){
+
+  const box =
+document.getElementById('lowAlertDropdown');
+
+  const arrow =
+document.getElementById('lowAlertArrow');
+
+  if(box.style.display==='none'){
+
+    box.style.display='block';
+
+    arrow.textContent='▲';
+
+  } else {
+
+    box.style.display='none';
+
+    arrow.textContent='▼';
+
+  }
 
 }
 function init(){
