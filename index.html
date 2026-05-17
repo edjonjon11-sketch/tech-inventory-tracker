@@ -1056,13 +1056,31 @@ function renderJobs(){
     <div class="small">
       ${j.description}
     </div>
-${j.notes ? `
-<div class="small"
-style="margin-top:6px;color:#dbeafe;">
-NOTE:
-${j.notes}
+<div style="margin-top:8px;">
+
+<textarea
+id="note-${j.date}"
+placeholder="Add job notes..."
+style="
+width:100%;
+padding:10px;
+border-radius:10px;
+border:1px solid #385879;
+background:#08192b;
+color:white;
+min-height:80px;
+">${j.notes || ''}</textarea>
+
+<button
+class="btn secondary"
+style="margin-top:8px;"
+onclick="saveJobNotes('${j.date}')">
+
+Save Notes
+
+</button>
+
 </div>
-` : ''}
 
     <div class="small">
       Date: ${j.date}
@@ -1153,6 +1171,23 @@ Edit
   renderAll();
 
   alert(`Job #${jobNumber} deleted and inventory restored.`);
+
+}
+  function saveJobNotes(jobDate){
+
+  const noteBox =
+document.getElementById(`note-${jobDate}`);
+
+  const job =
+jobs.find(j=>j.date===jobDate);
+
+  if(!job) return;
+
+  job.notes = noteBox.value;
+
+  save();
+
+  alert('Notes updated.');
 
 }
 function renderAlerts(){
