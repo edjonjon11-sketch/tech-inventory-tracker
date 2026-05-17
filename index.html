@@ -1144,6 +1144,22 @@ font-weight:bold;
 </div>
 ` : ''}
 
+${items.some(x => x.notes && x.notes.trim() !== '') ? `
+<div
+style="
+margin-top:6px;
+display:inline-block;
+background:#f59e0b;
+color:white;
+padding:4px 10px;
+border-radius:999px;
+font-size:12px;
+font-weight:bold;
+">
+📝 Notes Added
+</div>
+` : ''}
+
 </div>
 
 <div id="job-${jobNum}" style="display:none;margin-top:12px;">
