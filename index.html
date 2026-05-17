@@ -174,6 +174,22 @@ Scan Inventory Screenshot
     <input id="jobNumber" placeholder="Example: 133005200">
     <label>Customer Name / Notes</label>
     <input id="customer" placeholder="Optional">
+    <label>Completion Notes</label>
+
+<textarea
+id="jobNotes"
+placeholder="Installed equipment, issues found, customer requests, follow-up needed..."
+style="
+width:100%;
+padding:13px;
+border-radius:12px;
+border:1px solid #385879;
+background:#08192b;
+color:#fff;
+margin:6px 0 12px;
+font-size:15px;
+min-height:100px;
+"></textarea>
     <label>Job Type</label>
     <select id="jobType"><option>Install</option><option>Service</option><option>Upgrade</option><option>GoBack</option></select>
     <label>Part Used</label>
@@ -968,6 +984,7 @@ function renderCurrentJobParts(){
 function finishJob(){
 
   const jobNumber=document.getElementById('jobNumber').value.trim();
+  notes:document.getElementById('jobNotes').value.trim(),
 
   currentJobParts.forEach(j=>{
 
@@ -1039,6 +1056,13 @@ function renderJobs(){
     <div class="small">
       ${j.description}
     </div>
+${j.notes ? `
+<div class="small"
+style="margin-top:6px;color:#dbeafe;">
+NOTE:
+${j.notes}
+</div>
+` : ''}
 
     <div class="small">
       Date: ${j.date}
