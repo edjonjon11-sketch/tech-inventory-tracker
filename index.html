@@ -50,6 +50,34 @@ h2{font-size:19px;margin:8px 0 4px}
     <div class="card"><div class="small">Jobs Logged</div><div id="jobCount" class="stat">0</div></div>
     <div class="card"><div class="small">Parts Used</div><div id="usedCount" class="stat">0</div></div>
   </div>
+  </div>
+
+<div class="card">
+
+<label>
+Current Technician ID
+</label>
+
+<input
+id="techIdInput"
+placeholder="Example: TE-170">
+
+<button
+class="btn good"
+onclick="saveTechId()">
+
+Save Technician ID
+
+</button>
+
+</div>
+
+<button class="btn"
+onclick="showScreen('job')">
+
+Start / Log Job
+
+</button>
   <button class="btn" onclick="showScreen('job')">Start / Log Job</button>
   <button class="btn secondary" onclick="showScreen('inventory')">Update Truck Inventory</button>
   <div class="card">
@@ -302,6 +330,8 @@ let parts = JSON.parse(localStorage.getItem('tti_parts') || JSON.stringify(defau
 let jobs = JSON.parse(localStorage.getItem('tti_jobs') || '[]');
 let transfers = JSON.parse(localStorage.getItem('tti_transfers') || '[]');
 let actualInventory = [];
+let currentTechId =
+localStorage.getItem('tti_techId') || '';
 function save(){
   localStorage.setItem('tti_parts', JSON.stringify(parts));
   localStorage.setItem('tti_jobs', JSON.stringify(jobs));
@@ -357,7 +387,8 @@ function saveTransfer(){
 
     description:p.description,
 
-    qty
+    qty,
+techName: currentTechId
 
   });
 
@@ -809,6 +840,23 @@ box.innerHTML=
 }
 
 }
+
+  function saveTechId(){
+
+  currentTechId =
+document.getElementById(
+'techIdInput'
+).value.trim();
+
+  localStorage.setItem(
+    'tti_techId',
+    currentTechId
+  );
+
+  alert('Technician ID saved.');
+
+}
+  
 function init(){
   const cats=[...new Set(parts.map(p=>p.category))].sort();
   const cat=document.getElementById('catFilter');
@@ -937,6 +985,7 @@ function finishJob(){
       jobNumber,
       customer:document.getElementById('customer').value.trim(),
       jobType:document.getElementById('jobType').value,
+      techName: currentTechId,
       partNumber:j.partNumber,
       description:j.description,
       qtyUsed:j.qtyUsed
