@@ -198,7 +198,19 @@ min-height:100px;
     <input id="qtyUsed" type="number" min="1" value="1">
     <button class="btn good" onclick="addPartUsed()">Add Part Used & Deduct Inventory</button>
   </div>
-  <div class="card"><h2>Recent Job Usage</h2><div id="recentJobs"></div></div>
+  <div class="card">
+
+<h2>Recent Job Usage</h2>
+
+<input
+  id="jobSearch"
+  placeholder="Search part number, description, or job #"
+  oninput="renderJobs()"
+>
+
+<div id="recentJobs"></div>
+
+</div>
 </section>
 
 <section id="transfers" class="screen">
@@ -1023,6 +1035,10 @@ function renderJobs(){
 
   list.innerHTML='';
 
+  const search =
+(document.getElementById('jobSearch')?.value || '')
+.toLowerCase();
+  
   const grouped={};
 
   jobs.forEach(j=>{
@@ -1036,6 +1052,24 @@ function renderJobs(){
   });
 
   Object.keys(grouped).forEach(jobNum=>{
+
+  const items=grouped[jobNum];
+
+  const matchesSearch = items.some(j =>
+
+    jobNum.toLowerCase().includes(search) ||
+
+    j.partNumber.toLowerCase().includes(search) ||
+
+    j.description.toLowerCase().includes(search) ||
+
+    (j.notes || '').toLowerCase().includes(search)
+
+  );
+
+  if(search && !matchesSearch){
+    return;
+  }
 
     const items=grouped[jobNum];
 
