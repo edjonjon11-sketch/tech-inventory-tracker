@@ -650,24 +650,52 @@ const text = result.data.text;
 
 const lines = text.split('\n');
 
-lines.forEach(line=>{
+for(let i = 0; i < lines.length; i++){
 
-const match =
-line.match(/([A-Z0-9\-]+)\s+(\d+)/);
+const line = lines[i].trim();
 
-if(match){
+const partMatch =
+line.match(/^([A-Z0-9\-]+)/);
+
+if(partMatch){
+
+const partNumber = partMatch[1];
+
+let qty = 0;
+
+for(let j = i+1; j <= i+3; j++){
+
+if(lines[j]){
+
+const qtyMatch =
+lines[j].match(/^\d+$/);
+
+if(qtyMatch){
+
+qty = Number(qtyMatch[0]);
+
+break;
+
+}
+
+}
+
+}
+
+if(qty > 0){
 
 actualInventory.push({
 
-partNumber:match[1],
-
-qty:Number(match[2])
+partNumber,
+qty
 
 });
 
 }
 
-});
+}
+
+}
 
 }
 
@@ -778,26 +806,52 @@ const text = result.data.text;
 
 const lines = text.split('\n');
 
-actualInventory = [];
+for(let i = 0; i < lines.length; i++){
 
-lines.forEach(line=>{
+const line = lines[i].trim();
 
-const match =
-line.match(/([A-Z0-9\-]+)\s+(\d+)/);
+const partMatch =
+line.match(/^([A-Z0-9\-]+)/);
 
-if(match){
+if(partMatch){
+
+const partNumber = partMatch[1];
+
+let qty = 0;
+
+for(let j = i+1; j <= i+3; j++){
+
+if(lines[j]){
+
+const qtyMatch =
+lines[j].match(/^\d+$/);
+
+if(qtyMatch){
+
+qty = Number(qtyMatch[0]);
+
+break;
+
+}
+
+}
+
+}
+
+if(qty > 0){
 
 actualInventory.push({
 
-partNumber:match[1],
-
-qty:Number(match[2])
+partNumber,
+qty
 
 });
 
 }
 
-});
+}
+
+}
 
 compareInventory();
 
