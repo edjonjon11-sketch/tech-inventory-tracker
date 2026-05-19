@@ -629,92 +629,6 @@ function deleteTransfer(i){
 
 }
 
-async async function scanActualInventory(){
-
-const files =
-document.getElementById(
-'actualInventoryImage'
-).files;
-
-if(!files.length){
-
-alert('Choose image first.');
-
-return;
-
-}
-
-actualInventory = [];
-
-for(const file of files){
-
-const result =
-await Tesseract.recognize(
-file,
-'eng'
-);
-
-const text = result.data.text;
-
-const lines = text.split('\n');
-
-for(let i = 0; i < lines.length; i++){
-
-const line = lines[i].trim();
-
-const partMatch =
-line.match(/^([A-Z0-9\-]+)/);
-
-if(partMatch){
-
-const partNumber = partMatch[1];
-
-let qty = 0;
-
-for(let j = i+1; j <= i+3; j++){
-
-if(lines[j]){
-
-const qtyMatch =
-lines[j].match(/^\d+$/);
-
-if(qtyMatch){
-
-qty = Number(qtyMatch[0]);
-
-break;
-
-}
-
-}
-
-}
-
-if(qty > 0){
-
-actualInventory.push({
-
-partNumber,
-qty
-
-});
-
-}
-
-}
-
-}
-
-}
-
-compareInventory();
-
-alert(
-`${files.length} screenshots scanned.`
-);
-
-}
-
   function toggleLowAlerts(){
 
   const box =
@@ -789,12 +703,12 @@ arrow.textContent='▼';
 }
   async function scanActualInventory(){
 
-const file =
+const files =
 document.getElementById(
 'actualInventoryImage'
-).files[0];
+).files;
 
-if(!file){
+if(!files.length){
 
 alert('Choose image first.');
 
@@ -802,7 +716,11 @@ return;
 
 }
 
-alert('Scanning actual inventory...');
+actualInventory = [];
+
+alert(`Scanning ${files.length} screenshot(s)...`);
+
+for(const file of files){
 
 const result =
 await Tesseract.recognize(
@@ -848,11 +766,20 @@ break;
 
 if(qty > 0){
 
-actualInventory.push({
+const existing =
+actualInventory.find(
+a=>a.partNumber===partNumber
+);
 
+if(existing){
+
+existing.qty += qty;
+
+}else{
+
+actualInventory.push({
 partNumber,
 qty
-
 });
 
 }
@@ -861,7 +788,15 @@ qty
 
 }
 
+}
+
+}
+
 compareInventory();
+
+alert(
+`${files.length} screenshots scanned successfully.`
+);
 
 }
   function compareInventory(){
