@@ -142,6 +142,14 @@ onclick="scanActualInventory()">
 Scan Actual Inventory
 </button>
 
+<button
+class="btn danger"
+onclick="clearRecon()">
+
+Clear Reconciliation
+
+</button>
+  
 <div id="reconResults"></div>
 
 </div>
@@ -922,6 +930,24 @@ box.innerHTML=
 }
 
 }
+
+function clearRecon(){
+
+actualInventory = [];
+
+document.getElementById(
+'reconResults'
+).innerHTML = '';
+
+document.getElementById(
+'actualInventoryImage'
+).value = '';
+
+alert('Reconciliation cleared.');
+
+}
+  
+
 
   function saveTechId(){
 
