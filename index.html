@@ -738,16 +738,24 @@ arrow.textContent='▼';
             if(!lines[j]) continue;
 
             const qtyMatch =
-            lines[j].match(/\b\d+\b/g);
+lines[i].match(/\b\d{1,3}\b/g);
 
-            if(qtyMatch){
+if(qtyMatch){
 
-              qty =
-              Number(
-                qtyMatch[
-                  qtyMatch.length-1
-                ]
-              );
+  let qty = 0;
+
+  qtyMatch.forEach(n=>{
+
+    const num = Number(n);
+
+    if(
+      num > 0 &&
+      num < 500
+    ){
+      qty = num;
+    }
+
+  });
 
               if(qty > 0) break;
 
@@ -964,16 +972,24 @@ new Set(jobs.map(j=>j.jobNumber)).size;
           if(!lines[i]) continue;
 
           const qtyMatch =
-          lines[i].match(/\b\d+\b/g);
+lines[i].match(/\b\d{1,3}\b/g);
 
-          if(qtyMatch){
+if(qtyMatch){
 
-            const qty =
-            Number(
-              qtyMatch[
-                qtyMatch.length-1
-              ]
-            );
+  let qty = 0;
+
+  qtyMatch.forEach(n=>{
+
+    const num = Number(n);
+
+    if(
+      num > 0 &&
+      num < 500
+    ){
+      qty = num;
+    }
+
+  });
 
             if(qty > 0){
 
