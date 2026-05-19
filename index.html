@@ -945,6 +945,8 @@ new Set(jobs.map(j=>j.jobNumber)).size;
 
   let updated = 0;
 
+  let updatedItems = [];
+
   parts.forEach(p=>{
 
     const cleanPart =
@@ -976,6 +978,10 @@ new Set(jobs.map(j=>j.jobNumber)).size;
 
         updated++;
 
+        updatedItems.push(
+          `${p.partNumber} → ${qty}`
+        );
+
       }
 
     }
@@ -986,9 +992,21 @@ new Set(jobs.map(j=>j.jobNumber)).size;
 
   renderAll();
 
-  alert(
-    `${updated} inventory items updated.`
-  );
+  if(updated > 0){
+
+    alert(
+`Updated ${updated} inventory items:
+
+${updatedItems.join('\n')}`
+    );
+
+  } else {
+
+    alert(
+      '0 inventory items updated.'
+    );
+
+  }
 
 }
 function renderInventory(){
