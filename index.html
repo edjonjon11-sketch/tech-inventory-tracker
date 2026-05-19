@@ -1013,10 +1013,16 @@ function renderCurrentJobParts(){
 
 function finishJob(){
 
-  const jobNumber=document.getElementById('jobNumber').value.trim();
+  const jobNumber =
+  document.getElementById('jobNumber').value.trim();
 
-const jobNotes =
-document.getElementById('jobNotes').value.trim();
+  const jobNotes =
+  document.getElementById('jobNotes').value.trim();
+
+  if(!jobNumber){
+    alert('Enter a job number first.');
+    return;
+  }
 
   currentJobParts.forEach(j=>{
 
@@ -1046,6 +1052,8 @@ document.getElementById('jobNotes').value.trim();
   renderAll();
 
   document.getElementById('currentJobParts').innerHTML='';
+
+  document.getElementById('jobNotes').value='';
 
   alert('Job completed and inventory deducted.');
 
