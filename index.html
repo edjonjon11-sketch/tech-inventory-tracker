@@ -133,7 +133,8 @@ Upload Actual Inventory Screenshot
 <input
 type="file"
 id="actualInventoryImage"
-accept="image/*">
+accept="image/*"
+multiple>
 
 <button
 class="btn good"
@@ -620,58 +621,61 @@ function deleteTransfer(i){
 
 }
 
-async function scanInventoryImage(){
+async async function scanActualInventory(){
 
-  const file =
-document.getElementById('inventoryImage').files[0];
+const files =
+document.getElementById(
+'actualInventoryImage'
+).files;
 
-  if(!file){
-    alert('Choose an image first.');
-    return;
-  }
+if(!files.length){
 
-  alert('Scanning image...');
+alert('Choose image first.');
 
-  const result =
+return;
+
+}
+
+actualInventory = [];
+
+for(const file of files){
+
+const result =
 await Tesseract.recognize(
-  file,
-  'eng'
+file,
+'eng'
 );
 
-  const text = result.data.text;
+const text = result.data.text;
 
-  const lines = text.split('\n');
+const lines = text.split('\n');
 
-  lines.forEach(line=>{
+lines.forEach(line=>{
 
-    const match =
+const match =
 line.match(/([A-Z0-9\-]+)\s+(\d+)/);
 
-    if(match){
+if(match){
 
-      const partNum = match[1];
+actualInventory.push({
 
-      const qty = Number(match[2]);
+partNumber:match[1],
 
-      const found = parts.find(
-        p=>p.partNumber === partNum
-      );
+qty:Number(match[2])
 
-      if(found){
+});
 
-        found.qty += qty;
+}
 
-      }
+});
 
-    }
+}
 
-  });
+compareInventory();
 
-  save();
-
-  renderAll();
-
-  alert('Inventory updated from screenshot.');
+alert(
+`${files.length} screenshots scanned.`
+);
 
 }
 
