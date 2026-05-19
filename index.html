@@ -681,100 +681,117 @@ arrow.textContent='▼';
 }
   async function scanActualInventory(){
 
-const files =
-document.getElementById(
-'actualInventoryImage'
-).files;
+  const files =
+  document.getElementById(
+    'actualInventoryImage'
+  ).files;
 
-if(!files.length){
+  if(!files.length){
+    alert('Choose image first.');
+    return;
+  }
 
-alert('Choose image first.');
+  actualInventory = [];
 
-return;
+  alert(`Scanning ${files.length} screenshot(s)...`);
 
-}
+  for(const file of files){
 
-actualInventory = [];
+    const result =
+    await Tesseract.recognize(
+      file,
+      'eng'
+    );
 
-alert(`Scanning ${files.length} screenshot(s)...`);
+    const text = result.data.text;
 
-for(const file of files){
+    const lines = text.split('\n');
 
-const result =
-await Tesseract.recognize(
-file,
-'eng'
-);
+    for(let i=0;i<lines.length;i++){
 
-const text = result.data.text;
+      const line =
+      lines[i].trim();
 
-const lines = text.split('\n');
+      if(!line) continue;
 
-for(let i = 0; i < lines.length; i++){
+      parts.forEach(p=>{
 
-const line = lines[i].trim();
+        const normalizedPart =
+        p.partNumber
+        .replace(/[^A-Z0-9]/g,'');
 
-const partMatch =
-line.match(/^([A-Z0-9\-]+)/);
+        const normalizedLine =
+        line
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g,'');
 
-if(partMatch){
+        if(
+          normalizedLine.includes(
+            normalizedPart
+          )
+        ){
 
-const partNumber = partMatch[1];
+          let qty = 0;
 
-let qty = 0;
+          for(let j=i;j<=i+2;j++){
 
-for(let j = i+1; j <= i+3; j++){
+            if(!lines[j]) continue;
 
-if(lines[j]){
+            const qtyMatch =
+            lines[j].match(/\b\d+\b/g);
 
-const qtyMatch =
-lines[j].match(/^\d+$/);
+            if(qtyMatch){
 
-if(qtyMatch){
+              qty =
+              Number(
+                qtyMatch[
+                  qtyMatch.length-1
+                ]
+              );
 
-qty = Number(qtyMatch[0]);
+              if(qty > 0) break;
 
-break;
+            }
 
-}
+          }
 
-}
+          if(qty > 0){
 
-}
+            const existing =
+            actualInventory.find(
+              a=>
+              a.partNumber===
+              p.partNumber
+            );
 
-if(qty > 0){
+            if(existing){
 
-const existing =
-actualInventory.find(
-a=>a.partNumber===partNumber
-);
+              existing.qty = qty;
 
-if(existing){
+            } else {
 
-existing.qty += qty;
+              actualInventory.push({
+                partNumber:p.partNumber,
+                qty
+              });
 
-}else{
+            }
 
-actualInventory.push({
-partNumber,
-qty
-});
+          }
 
-}
+        }
 
-}
+      });
 
-}
+    }
 
-}
+  }
 
-}
+  compareInventory();
 
-compareInventory();
-
-alert(
-`${files.length} screenshots scanned successfully.`
-);
+  alert(
+    'Inventory scan completed.'
+  );
 
 }
     
