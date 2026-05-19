@@ -255,6 +255,15 @@ min-height:100px;
     
   </div>
 </section>
+  <section id="updates" class="screen">
+
+<h2>
+Inventory Update History
+</h2>
+
+<div id="updateHistory"></div>
+
+</section>
   
 <section id="alerts" class="screen">
   <h2>Low Inventory</h2>
@@ -363,12 +372,36 @@ let parts = JSON.parse(localStorage.getItem('tti_parts') || JSON.stringify(defau
 let jobs = JSON.parse(localStorage.getItem('tti_jobs') || '[]');
 let transfers = JSON.parse(localStorage.getItem('tti_transfers') || '[]');
 let actualInventory = [];
+let inventoryUpdates =
+JSON.parse(
+localStorage.getItem(
+'tti_inventory_updates'
+) || '[]'
+);
 let currentTechId =
 localStorage.getItem('tti_techId') || '';
 function save(){
-  localStorage.setItem('tti_parts', JSON.stringify(parts));
-  localStorage.setItem('tti_jobs', JSON.stringify(jobs));
-  localStorage.setItem('tti_transfers', JSON.stringify(transfers));
+
+  localStorage.setItem(
+    'tti_parts',
+    JSON.stringify(parts)
+  );
+
+  localStorage.setItem(
+    'tti_jobs',
+    JSON.stringify(jobs)
+  );
+
+  localStorage.setItem(
+    'tti_transfers',
+    JSON.stringify(transfers)
+  );
+
+  localStorage.setItem(
+    'tti_inventory_updates',
+    JSON.stringify(inventoryUpdates)
+  );
+
 }
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
