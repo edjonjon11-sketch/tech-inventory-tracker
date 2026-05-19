@@ -1014,7 +1014,9 @@ function renderCurrentJobParts(){
 function finishJob(){
 
   const jobNumber=document.getElementById('jobNumber').value.trim();
-  notes:document.getElementById('jobNotes').value.trim(),
+
+const jobNotes =
+document.getElementById('jobNotes').value.trim();
 
   currentJobParts.forEach(j=>{
 
