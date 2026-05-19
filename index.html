@@ -941,73 +941,44 @@ new Set(jobs.map(j=>j.jobNumber)).size;
   );
 
   const text =
-  result.data.text;
+  result.data.text.toUpperCase();
 
   let updated = 0;
 
   parts.forEach(p=>{
 
-    const normalizedPart =
+    const cleanPart =
     p.partNumber
+    .toUpperCase()
     .replace(/[^A-Z0-9]/g,'');
 
-    const lines =
-    text.split('\n');
+    const regex =
+    new RegExp(
+      cleanPart
+      .replace(/[-]/g,'[- ]?') +
+      '[\\s\\S]{0,80}?(\\d+)',
+      'i'
+    );
 
-    lines.forEach((line,index)=>{
+    const match =
+    text
+    .replace(/[^A-Z0-9\s]/g,' ')
+    .match(regex);
 
-      const normalizedLine =
-      line
-      .toUpperCase()
-      .replace(/[^A-Z0-9]/g,'');
+    if(match){
 
-      if(
-        normalizedLine.includes(
-          normalizedPart
-        )
-      ){
+      const qty =
+      Number(match[1]);
 
-        for(let i=index;i<=index+2;i++){
+      if(!isNaN(qty) && qty > 0){
 
-          if(!lines[i]) continue;
+        p.qty = qty;
 
-          const qtyMatch =
-lines[i].match(/\b\d{1,3}\b/g);
-
-if(qtyMatch){
-
-  let qty = 0;
-
-  qtyMatch.forEach(n=>{
-
-    const num = Number(n);
-
-    if(
-      num > 0 &&
-      num < 500
-    ){
-      qty = num;
-    }
-
-  });
-
-            if(qty > 0){
-
-              p.qty = qty;
-
-              updated++;
-
-              break;
-
-            }
-
-          }
-
-        }
+        updated++;
 
       }
 
-    });
+    }
 
   });
 
