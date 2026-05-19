@@ -911,6 +911,99 @@ function renderStats(){
 new Set(jobs.map(j=>j.jobNumber)).size;
   document.getElementById('usedCount').textContent = jobs.reduce((a,j)=>a+Number(j.qtyUsed||0),0);
 }
+
+  async function scanInventoryImage(){
+
+  const file =
+  document.getElementById(
+    'inventoryImage'
+  ).files[0];
+
+  if(!file){
+    alert('Choose screenshot first.');
+    return;
+  }
+
+  alert('Scanning inventory screenshot...');
+
+  const result =
+  await Tesseract.recognize(
+    file,
+    'eng'
+  );
+
+  const text =
+  result.data.text;
+
+  let updated = 0;
+
+  parts.forEach(p=>{
+
+    const normalizedPart =
+    p.partNumber
+    .replace(/[^A-Z0-9]/g,'');
+
+    const lines =
+    text.split('\n');
+
+    lines.forEach((line,index)=>{
+
+      const normalizedLine =
+      line
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g,'');
+
+      if(
+        normalizedLine.includes(
+          normalizedPart
+        )
+      ){
+
+        for(let i=index;i<=index+2;i++){
+
+          if(!lines[i]) continue;
+
+          const qtyMatch =
+          lines[i].match(/\b\d+\b/g);
+
+          if(qtyMatch){
+
+            const qty =
+            Number(
+              qtyMatch[
+                qtyMatch.length-1
+              ]
+            );
+
+            if(qty > 0){
+
+              p.qty = qty;
+
+              updated++;
+
+              break;
+
+            }
+
+          }
+
+        }
+
+      }
+
+    });
+
+  });
+
+  save();
+
+  renderAll();
+
+  alert(
+    `${updated} inventory items updated.`
+  );
+
+}
 function renderInventory(){
   const q=(document.getElementById('search')?.value||'').toLowerCase();
   const c=document.getElementById('catFilter')?.value||'';
