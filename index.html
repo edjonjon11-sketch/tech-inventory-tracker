@@ -538,6 +538,19 @@ box.style.display==='none'
 : 'none';
 
 }
+  function toggleUpdate(i){
+
+  const box =
+  document.getElementById(
+    `update-${i}`
+  );
+
+  box.style.display =
+  box.style.display==='none'
+  ? 'block'
+  : 'none';
+
+}
 
 function deleteJob(jobNum){
 
@@ -951,8 +964,27 @@ function init(){
   cats.forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;cat.appendChild(o);});
   renderAll();
 }
-function renderAll(){ renderStats(); renderInventory(); renderPartSelect(); renderJobs(); renderAlerts();renderSummary(); renderTransferParts();
-renderTransfers(); }
+function renderAll(){
+
+  renderStats();
+
+  renderInventory();
+
+  renderPartSelect();
+
+  renderJobs();
+
+  renderAlerts();
+
+  renderSummary();
+
+  renderTransferParts();
+
+  renderTransfers();
+
+  renderUpdateHistory();
+
+}
 function renderStats(){
   document.getElementById('totalParts').textContent = parts.length;
   document.getElementById('lowCount').textContent = parts.filter(p=>Number(p.qty)<=Number(p.minQty)).length;
@@ -985,6 +1017,7 @@ new Set(jobs.map(j=>j.jobNumber)).size;
   result.data.text.toUpperCase();
 
   let updated = 0;
+  let historyItems = [];
 
   let updatedItems = [];
 
@@ -1021,6 +1054,11 @@ new Set(jobs.map(j=>j.jobNumber)).size;
 
         updatedItems.push(
           `${p.partNumber} → ${qty}`
+          historyItems.push({
+  partNumber:p.partNumber,
+  qty,
+  date:new Date().toLocaleString()
+});
         );
 
       }
@@ -1029,9 +1067,21 @@ new Set(jobs.map(j=>j.jobNumber)).size;
 
   });
 
-  save();
+  if(historyItems.length > 0){
 
-  renderAll();
+  inventoryUpdates.unshift({
+
+    date:new Date().toLocaleString(),
+
+    items:historyItems
+
+  });
+
+}
+
+save();
+
+renderAll();
 
   if(updated > 0){
 
@@ -1475,6 +1525,90 @@ function exportData(){
     d.className='item';
     d.innerHTML=`<div><b>${p.partNumber}</b><div class="small">${p.description}</div></div><span class="badge low">${p.qty}</span>`;
     lowBox.appendChild(d);
+  });
+
+}
+  function renderUpdateHistory(){
+
+  const box =
+  document.getElementById(
+    'updateHistory'
+  );
+
+  if(!box) return;
+
+  box.innerHTML='';
+
+  if(inventoryUpdates.length===0){
+
+    box.innerHTML=
+    '<div class="small">No inventory updates yet.</div>';
+
+    return;
+
+  }
+
+  inventoryUpdates.forEach((u,i)=>{
+
+    let itemsHTML='';
+
+    u.items.forEach(item=>{
+
+      itemsHTML +=
+`
+<div class="item">
+
+<div>
+
+<b>${item.partNumber}</b>
+
+<div class="small">
+Qty Updated To: ${item.qty}
+</div>
+
+</div>
+
+</div>
+`;
+
+    });
+
+    let div =
+    document.createElement('div');
+
+    div.className='card';
+
+    div.innerHTML=
+`
+<div
+onclick="toggleUpdate(${i})"
+style="cursor:pointer;">
+
+<b>
+Inventory Scan
+</b>
+
+<div class="small">
+${u.date}
+</div>
+
+<div class="small">
+Tap To Expand
+</div>
+
+</div>
+
+<div
+id="update-${i}"
+style="display:none;margin-top:12px;">
+
+${itemsHTML}
+
+</div>
+`;
+
+    box.appendChild(div);
+
   });
 
 }
