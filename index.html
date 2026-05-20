@@ -1048,18 +1048,20 @@ new Set(jobs.map(j=>j.jobNumber)).size;
 
       if(!isNaN(qty) && qty > 0){
 
-        p.qty = qty;
-
         updated++;
+updatedItems.push(
+  `${p.partNumber} → ${qty}`
+);
 
-        updatedItems.push(
-          `${p.partNumber} → ${qty}`
-          historyItems.push({
+historyItems.push({
   partNumber:p.partNumber,
   qty,
+  oldQty:p.qty,
   date:new Date().toLocaleString()
 });
-        );
+
+p.qty = qty;
+        
 
       }
 
