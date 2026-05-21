@@ -387,7 +387,12 @@ localStorage.getItem(
 );
 let currentTechId =
 localStorage.getItem('tti_techId') || '';
-
+let inventoryAdjustments =
+JSON.parse(
+localStorage.getItem(
+'tti_inventory_adjustments'
+) || '[]'
+);
   function save(){
 
   localStorage.setItem(
@@ -404,7 +409,10 @@ localStorage.getItem('tti_techId') || '';
     'tti_transfers',
     JSON.stringify(transfers)
   );
-
+localStorage.setItem(
+  'tti_inventory_adjustments',
+  JSON.stringify(inventoryAdjustments)
+);
   localStorage.setItem(
     'tti_inventory_updates',
     JSON.stringify(inventoryUpdates)
@@ -1214,10 +1222,35 @@ function finishJob(){
 
   currentJobParts.forEach(j=>{
 
-    parts[j.index].qty=Math.max(
-      0,
-      Number(parts[j.index].qty)-Number(j.qtyUsed)
-    );
+  const currentQty =
+Number(parts[j.index].qty);
+
+const newQty =
+currentQty - Number(j.qtyUsed);
+
+parts[j.index].qty = newQty;
+
+if(newQty < 0){
+
+  inventoryAdjustments.unshift({
+
+    date:new Date().toLocaleString(),
+
+    type:'Missing Inventory',
+
+    partNumber:j.partNumber,
+
+    description:j.description,
+
+    missingQty:Math.abs(newQty),
+
+    jobNumber:jobNumber,
+
+    techName:currentTechId
+
+  });
+
+}
 
     jobs.unshift({
       date:new Date().toLocaleString(),
