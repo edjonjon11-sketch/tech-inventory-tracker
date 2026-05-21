@@ -1069,7 +1069,33 @@ historyItems.push({
 });
 
 p.qty = qty;
-        
+ const missing =
+inventoryAdjustments.find(a=>
+  a.partNumber===p.partNumber &&
+  a.type==='Missing Inventory'
+);
+
+if(missing && qty >= 0){
+
+  inventoryAdjustments.unshift({
+
+    date:new Date().toLocaleString(),
+
+    type:'Replenishment Applied',
+
+    partNumber:p.partNumber,
+
+    description:p.description,
+
+    replenishedQty:qty,
+
+    resolvedJob:missing.jobNumber,
+
+    techName:currentTechId
+
+  });
+
+}
 
       }
 
