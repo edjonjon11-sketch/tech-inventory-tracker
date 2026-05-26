@@ -1178,6 +1178,13 @@ onchange="savePartNote(${realIndex},this.value)"
 function changeQty(i,delta){ parts[i].qty=Math.max(0,Number(parts[i].qty)+delta); save(); renderAll(); }
 function setQty(i,val){ parts[i].qty=Math.max(0,Number(val)||0); save(); renderAll(); }
 function setMin(i,val){ parts[i].minQty=Math.max(0,Number(val)||0); save(); renderAll(); }
+function savePartNote(i,val){
+
+  parts[i].notes = val;
+
+  save();
+
+}
 function renderPartSelect(){
   const sel=document.getElementById('partSelect');
   sel.innerHTML='';
