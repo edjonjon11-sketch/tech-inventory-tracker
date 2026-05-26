@@ -549,34 +549,82 @@ function addNewPart(){
   
 function saveTransfer(){
 
-  const i=Number(document.getElementById('transferPart').value);
+  const i =
+  Number(
+    document.getElementById(
+      'transferPart'
+    ).value
+  );
 
-  const qty=Number(document.getElementById('transferQty').value)||1;
+  const qty =
+  Number(
+    document.getElementById(
+      'transferQty'
+    ).value
+  ) || 1;
 
-  const p=parts[i];
+  const p = parts[i];
+
+  if(!p) return;
+
+  if(qty < 1){
+
+    alert('Enter valid qty.');
+
+    return;
+
+  }
+
+  if(Number(p.qty) < qty){
+
+    alert(
+      `Not enough inventory.
+
+Available: ${p.qty}`
+    );
+
+    return;
+
+  }
+
+  p.qty =
+    Number(p.qty) - qty;
 
   transfers.unshift({
 
-    date:new Date().toLocaleString(),
+    date:
+    new Date().toLocaleString(),
 
-    from:document.getElementById('transferFrom').value,
+    from:
+    document.getElementById(
+      'transferFrom'
+    ).value,
 
-    to:document.getElementById('transferTo').value,
+    to:
+    document.getElementById(
+      'transferTo'
+    ).value,
 
-    partNumber:p.partNumber,
+    partNumber:
+    p.partNumber,
 
-    description:p.description,
+    description:
+    p.description,
 
     qty,
-techName: currentTechId
+
+    techName:
+    currentTechId
 
   });
 
   save();
 
-  renderTransfers();
+  renderAll();
 
-  alert('Transfer saved.');
+  alert(
+    `${qty} deducted from ${p.partNumber}`
+  );
 
 }
 
