@@ -28,7 +28,17 @@ label{font-size:13px;color:#b9d3f5}
 .badge{font-size:12px;padding:4px 8px;border-radius:999px;background:#1e3a5f}
 .low{background:#ef4444;color:white}
 .ok{background:#16a34a;color:white}
-nav{position:fixed;bottom:0;left:0;right:0;background:#08192b;border-top:1px solid #203b5c;display:grid;grid-template-columns:repeat(4,1fr);z-index:10}
+nav{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:#08192b;
+border-top:1px solid #203b5c;
+display:grid;
+grid-template-columns:repeat(7,1fr);
+z-index:10
+}
 nav button{background:none;border:0;color:#b9d3f5;padding:10px 3px;font-size:12px}
 nav button.active{color:#fff;background:#0f2d4d}
 .qtybox{display:flex;gap:8px;align-items:center}
@@ -72,8 +82,6 @@ Save Technician ID
 
 </div>
 
-
-</button>
   <button class="btn" onclick="showScreen('job')">Start / Log Job</button>
   <button class="btn secondary" onclick="showScreen('inventory')">Update Truck Inventory</button>
   <div class="card">
@@ -388,6 +396,7 @@ parts.forEach(p=>{
   }
 
 });
+ save(); 
 let jobs = JSON.parse(localStorage.getItem('tti_jobs') || '[]');
 let transfers = JSON.parse(localStorage.getItem('tti_transfers') || '[]');
 let actualInventory = [];
