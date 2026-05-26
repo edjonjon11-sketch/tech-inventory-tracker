@@ -180,7 +180,16 @@ onclick="scanInventoryImage()">
 Scan Inventory Screenshot
 </button>
   <input id="search" placeholder="Search part number or description" oninput="renderInventory()">
-  <select id="catFilter" onchange="renderInventory()"><option value="">All Categories</option></select>
+  <div
+id="categoryTabs"
+style="
+display:flex;
+gap:8px;
+overflow-x:auto;
+margin:10px 0 14px;
+padding-bottom:6px;
+">
+</div>
   <button
 class="btn good"
 onclick="addNewPart()">
@@ -420,6 +429,7 @@ localStorage.getItem(
 'tti_inventory_adjustments'
 ) || '[]'
 );
+let selectedCategory = '';
   function save(){
 
   localStorage.setItem(
@@ -1064,7 +1074,8 @@ function renderAll(){
 
   renderStats();
 
-  renderInventory();
+  renderCategoryTabs();
+renderInventory();
 
   renderPartSelect();
 
@@ -1224,9 +1235,84 @@ ${updatedItems.join('\n')}`
   }
 
 }
+  function renderCategoryTabs(){
+
+  const box =
+  document.getElementById(
+    'categoryTabs'
+  );
+
+  if(!box) return;
+
+  box.innerHTML='';
+
+  const cats =
+  [...new Set(parts.map(
+    p=>p.category
+  ))].sort();
+
+  const allBtn =
+  document.createElement('button');
+
+  allBtn.className='btn secondary';
+
+  allBtn.style.width='auto';
+
+  allBtn.textContent='All';
+
+  allBtn.onclick=()=>{
+
+    selectedCategory='';
+
+    renderInventory();
+
+    renderCategoryTabs();
+
+  };
+
+  if(selectedCategory===''){
+
+    allBtn.style.background='#1e88ff';
+
+  }
+
+  box.appendChild(allBtn);
+
+  cats.forEach(c=>{
+
+    const btn =
+    document.createElement('button');
+
+    btn.className='btn secondary';
+
+    btn.style.width='auto';
+
+    btn.textContent=c;
+
+    if(selectedCategory===c){
+
+      btn.style.background='#1e88ff';
+
+    }
+
+    btn.onclick=()=>{
+
+      selectedCategory=c;
+
+      renderInventory();
+
+      renderCategoryTabs();
+
+    };
+
+    box.appendChild(btn);
+
+  });
+
+}
 function renderInventory(){
   const q=(document.getElementById('search')?.value||'').toLowerCase();
-  const c=document.getElementById('catFilter')?.value||'';
+  const c = selectedCategory;
   const list=document.getElementById('inventoryList');
 
   list.innerHTML='';
