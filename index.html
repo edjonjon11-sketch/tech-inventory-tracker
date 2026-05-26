@@ -618,13 +618,38 @@ function renderTransfers(){
 
 </div>
 
-<button class="btn danger"
+<div
+style="
+display:flex;
+flex-direction:column;
+gap:8px;
+">
+
+<button
+class="btn good"
+onclick="emailSingleTransfer(${i})"
+style="
+width:auto;
+padding:8px 12px;
+">
+
+Email
+
+</button>
+
+<button
+class="btn danger"
 onclick="deleteTransfer(${i})"
-style="width:auto;padding:8px 12px;">
+style="
+width:auto;
+padding:8px 12px;
+">
 
 Delete
 
 </button>
+
+</div>
 
 `;
 
@@ -724,6 +749,42 @@ ${text}
 
 }
 
+function emailSingleTransfer(i){
+
+  const t = transfers[i];
+
+  if(!t) return;
+
+  const body =
+`TRUCK TRANSFER
+
+PART:
+${t.partNumber}
+
+DESCRIPTION:
+${t.description}
+
+QTY:
+${t.qty}
+
+FROM:
+${t.from}
+
+TO:
+${t.to}
+
+TECH:
+${t.techName || ''}
+
+DATE:
+${t.date}
+`;
+
+  window.location.href =
+`mailto:?subject=Truck Transfer ${t.partNumber}&body=${encodeURIComponent(body)}`;
+
+}
+  
 function deleteTransfer(i){
 
   if(!confirm(
