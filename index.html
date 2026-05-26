@@ -1065,10 +1065,9 @@ document.getElementById(
 }
   
 function init(){
-  const cats=[...new Set(parts.map(p=>p.category))].sort();
-  const cat=document.getElementById('catFilter');
-  cats.forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;cat.appendChild(o);});
+
   renderAll();
+
 }
 function renderAll(){
 
