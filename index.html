@@ -1152,36 +1152,68 @@ function renderInventory(){
   const q=(document.getElementById('search')?.value||'').toLowerCase();
   const c=document.getElementById('catFilter')?.value||'';
   const list=document.getElementById('inventoryList');
+
   list.innerHTML='';
-  parts.filter(p=>(!c||p.category===c)&&(p.partNumber.toLowerCase().includes(q)||p.description.toLowerCase().includes(q))).forEach((p,i)=>{
+
+  parts
+  .filter(p=>
+    (!c || p.category===c) &&
+    (
+      p.partNumber.toLowerCase().includes(q) ||
+      p.description.toLowerCase().includes(q)
+    )
+  )
+  .forEach((p,i)=>{
+
     const realIndex=parts.indexOf(p);
     const div=document.createElement('div');
+
     div.className='card';
-    div.innerHTML=`<div class="item"><div><b>${p.partNumber}</b><div class="small">${p.description}</div><div class="small">${p.category}</div></div><span class="badge ${Number(p.qty)<=Number(p.minQty)?'low':'ok'}">Qty: ${p.qty}</span></div>
-    <div class="qtybox"><button onclick="changeQty(${realIndex},-1)">-</button><input type="number" value="${p.qty}" onchange="setQty(${realIndex},this.value)"><button onclick="changeQty(${realIndex},1)">+</button></div>
-    <label>Min Qty</label>
 
-<input
-type="number"
-value="${p.minQty}"
-onchange="setMin(${realIndex},this.value)">
+    div.innerHTML=`
+      <div class="item">
+        <div>
+          <b>${p.partNumber}</b>
+          <div class="small">${p.description}</div>
+          <div class="small">${p.category}</div>
+        </div>
 
-<label>Notes</label>
+        <span class="badge ${Number(p.qty)<=Number(p.minQty)?'low':'ok'}">
+          Qty: ${p.qty}
+        </span>
+      </div>
 
-<textarea
-style="
-width:100%;
-padding:12px;
-border-radius:12px;
-border:1px solid #385879;
-background:#08192b;
-color:#fff;
-min-height:80px;
-margin-top:6px;
-"
-onchange="savePartNote(${realIndex},this.value)"
->${p.notes || ''}</textarea>
+      <div class="qtybox">
+        <button onclick="changeQty(${realIndex},-1)">-</button>
+        <input type="number" value="${p.qty}" onchange="setQty(${realIndex},this.value)">
+        <button onclick="changeQty(${realIndex},1)">+</button>
+      </div>
+
+      <label>Min Qty</label>
+      <input
+        type="number"
+        value="${p.minQty}"
+        onchange="setMin(${realIndex},this.value)"
+      >
+
+      <label>Notes</label>
+      <textarea
+        style="
+        width:100%;
+        padding:12px;
+        border-radius:12px;
+        border:1px solid #385879;
+        background:#08192b;
+        color:#fff;
+        min-height:80px;
+        margin-top:6px;
+        "
+        onchange="savePartNote(${realIndex},this.value)"
+      >${p.notes || ''}</textarea>
+    `;
+
     list.appendChild(div);
+
   });
 }
 function changeQty(i,delta){ parts[i].qty=Math.max(0,Number(parts[i].qty)+delta); save(); renderAll(); }
