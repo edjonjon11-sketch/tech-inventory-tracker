@@ -1220,7 +1220,7 @@ new Set(jobs.map(j=>j.jobNumber)).size;
     return;
   }
 
-  alert('Scanning inventory screenshot...');
+  alert('Scanning screenshot...');
 
   const result =
   await Tesseract.recognize(
@@ -1229,118 +1229,145 @@ new Set(jobs.map(j=>j.jobNumber)).size;
   );
 
   const text =
-  result.data.text.toUpperCase();
+  result.data.text;
 
-  let updated = 0;
-  let historyItems = [];
+  const lines =
+  text.split('\n');
 
-  let updatedItems = [];
+  let foundItems = [];
 
   parts.forEach(p=>{
 
     const cleanPart =
-    p.partNumber
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g,'');
+      p.partNumber
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g,'');
 
-    const regex =
-    new RegExp(
-      cleanPart
-      .replace(/[-]/g,'[- ]?') +
-      '[\\s\\S]{0,80}?(\\d+)',
-      'i'
-    );
+    lines.forEach((line,i)=>{
 
-    const match =
-    text
-    .replace(/[^A-Z0-9\s]/g,' ')
-    .match(regex);
+      const cleanLine =
+        line
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g,'');
 
-    if(match){
+      if(
+        cleanLine.includes(cleanPart)
+      ){
 
-      const qty =
-      Number(match[1]);
+        let qty = 0;
 
-      if(!isNaN(qty) && qty > 0){
+        for(let j=i;j<=i+2;j++){
 
-        updated++;
-updatedItems.push(
-  `${p.partNumber} → ${qty}`
-);
+          if(!lines[j]) continue;
 
-historyItems.push({
-  partNumber:p.partNumber,
-  qty,
-  oldQty:p.qty,
-  date:new Date().toLocaleString()
-});
+          const nums =
+          lines[j].match(/\d+/g);
 
-p.qty = qty;
- const missing =
-inventoryAdjustments.find(a=>
-  a.partNumber===p.partNumber &&
-  a.type==='Missing Inventory'
-);
+          if(nums){
 
-if(missing && qty >= 0){
+            nums.forEach(n=>{
 
-  inventoryAdjustments.unshift({
+              const val =
+              Number(n);
 
-    date:new Date().toLocaleString(),
+              if(
+                val > 0 &&
+                val < 500
+              ){
+                qty = val;
+              }
 
-    type:'Replenishment Applied',
+            });
 
-    partNumber:p.partNumber,
+          }
 
-    description:p.description,
+        }
 
-    replenishedQty:qty,
+        if(qty > 0){
 
-    resolvedJob:missing.jobNumber,
+          foundItems.push({
+            part:p,
+            qty
+          });
 
-    techName:currentTechId
-
-  });
-
-}
+        }
 
       }
 
-    }
+    });
 
   });
 
-  if(historyItems.length > 0){
+  if(foundItems.length===0){
+
+    alert(
+      'No matching parts found.'
+    );
+
+    return;
+
+  }
+
+  let preview =
+  foundItems
+  .map(x=>
+`${x.part.partNumber} → ${x.qty}`
+  )
+  .join('\n');
+
+  if(
+    !confirm(
+`Found:
+
+${preview}
+
+Update inventory?`
+    )
+  ){
+    return;
+  }
+
+  let historyItems=[];
+
+  foundItems.forEach(x=>{
+
+    historyItems.push({
+
+      partNumber:
+      x.part.partNumber,
+
+      qty:x.qty,
+
+      oldQty:
+      x.part.qty,
+
+      date:
+      new Date().toLocaleString()
+
+    });
+
+    x.part.qty =
+    x.qty;
+
+  });
 
   inventoryUpdates.unshift({
 
-    date:new Date().toLocaleString(),
+    date:
+    new Date().toLocaleString(),
 
-    items:historyItems
+    items:
+    historyItems
 
   });
 
-}
+  save();
 
-save();
+  renderAll();
 
-renderAll();
-
-  if(updated > 0){
-
-    alert(
-`Updated ${updated} inventory items:
-
-${updatedItems.join('\n')}`
-    );
-
-  } else {
-
-    alert(
-      '0 inventory items updated.'
-    );
-
-  }
+  alert(
+    `${foundItems.length} parts updated.`
+  );
 
 }
   function renderCategoryTabs(){
