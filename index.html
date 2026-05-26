@@ -181,6 +181,13 @@ Scan Inventory Screenshot
 </button>
   <input id="search" placeholder="Search part number or description" oninput="renderInventory()">
   <select id="catFilter" onchange="renderInventory()"><option value="">All Categories</option></select>
+  <button
+class="btn good"
+onclick="addNewPart()">
+
++ Add New Part
+
+</button>
   <div id="inventoryList"></div>
 </section>
 
@@ -469,6 +476,67 @@ function renderTransferParts(){
 
 }
 
+function addNewPart(){
+
+  const category =
+  prompt(
+    'Category? (COMMAND / GOOGLE / V5 / BATTERIES / LOCKS / MISC)'
+  );
+
+  if(!category) return;
+
+  const partNumber =
+  prompt(
+    'Part Number?'
+  );
+
+  if(!partNumber) return;
+
+  const description =
+  prompt(
+    'Description?'
+  );
+
+  if(!description) return;
+
+  const qty =
+  Number(
+    prompt('Starting Qty?', '1')
+  ) || 0;
+
+  const minQty =
+  Number(
+    prompt('Min Qty?', '1')
+  ) || 0;
+
+  parts.unshift({
+
+    category:
+    category.toUpperCase(),
+
+    partNumber:
+    partNumber.toUpperCase(),
+
+    description,
+
+    qty,
+
+    minQty,
+
+    notes:''
+
+  });
+
+  save();
+
+  renderAll();
+
+  alert(
+    `${partNumber} added successfully.`
+  );
+
+}
+  
 function saveTransfer(){
 
   const i=Number(document.getElementById('transferPart').value);
