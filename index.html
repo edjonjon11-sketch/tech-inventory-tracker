@@ -379,6 +379,15 @@ const defaultParts = [
 {"category":"MISC","partNumber":"ADTPLUS-YS-R0-29","description":"Live Light Smart Sign","qty":1,"minQty":1,"notes":""}
 ];
 let parts = JSON.parse(localStorage.getItem('tti_parts') || JSON.stringify(defaultParts))
+parts.forEach(p=>{
+
+  if(!('notes' in p)){
+
+    p.notes = '';
+
+  }
+
+});
 let jobs = JSON.parse(localStorage.getItem('tti_jobs') || '[]');
 let transfers = JSON.parse(localStorage.getItem('tti_transfers') || '[]');
 let actualInventory = [];
