@@ -1395,10 +1395,35 @@ function renderInventory(){
     div.innerHTML=`
       <div class="item">
         <div>
-          <b>${p.partNumber}</b>
-          <div class="small">${p.description}</div>
-          <div class="small">${p.category}</div>
-        </div>
+
+  <b>
+    ${p.partNumber}
+
+    ${p.notes && p.notes.trim() !== '' ? `
+      <span
+      style="
+      background:#f59e0b;
+      color:white;
+      padding:3px 8px;
+      border-radius:999px;
+      font-size:11px;
+      margin-left:8px;
+      ">
+      📝
+      </span>
+    ` : ''}
+
+  </b>
+
+  <div class="small">
+    ${p.description}
+  </div>
+
+  <div class="small">
+    ${p.category}
+  </div>
+
+</div>
 
         <span class="badge ${Number(p.qty)<=Number(p.minQty)?'low':'ok'}">
           Qty: ${p.qty}
