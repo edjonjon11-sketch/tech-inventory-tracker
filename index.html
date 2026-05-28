@@ -1823,12 +1823,16 @@ Edit
   <b>Job #${jobNum}</b>
 
   <div class="small">
+    Customer: ${first.customer || 'No customer entered'}
+  </div>
+
+  <div class="small">
     Created: ${first.date}
   </div>
 
   <div class="small">
-Tap To Expand
-</div>
+    Tap To Expand
+  </div>
 
 ${items.some(x => x.notes && x.notes.trim() !== '') ? `
 <div
