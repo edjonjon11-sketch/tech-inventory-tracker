@@ -2282,6 +2282,14 @@ ${itemsHTML}
 function resetApp(){
   if(confirm('Reset all app data back to starter list?')){localStorage.removeItem('tti_parts');localStorage.removeItem('tti_jobs');location.reload();}
 }
+function openAdjustment(){
+
+  alert(
+    'Inventory Adjustment screen not built yet.'
+  );
+
+}
+  
  function emailReport(){
 
   let inventoryText = '';
@@ -2366,6 +2374,91 @@ ${jobsText}
 `mailto:?subject=Tech Inventory Report&body=${encodeURIComponent(body)}`;
 
 } 
+
+  function emailInventoryOnly(){
+
+  let inventoryText='';
+
+  parts.forEach(p=>{
+
+    inventoryText +=
+`${p.partNumber}
+${p.description}
+Qty: ${p.qty}
+
+`;
+
+  });
+
+  window.location.href =
+`mailto:?subject=Current Inventory&body=${encodeURIComponent(inventoryText)}`;
+
+}
+
+function emailSelectedJobs(){
+
+  let jobNum =
+  prompt('Enter Job Number');
+
+  if(!jobNum) return;
+
+  const selected =
+  jobs.filter(
+    j=>j.jobNumber===jobNum
+  );
+
+  if(selected.length===0){
+
+    alert('Job not found');
+
+    return;
+
+  }
+
+  let body='';
+
+  selected.forEach(j=>{
+
+    body +=
+`${j.partNumber}
+${j.description}
+Qty Used: ${j.qtyUsed}
+Date: ${j.date}
+
+`;
+
+  });
+
+  window.location.href =
+`mailto:?subject=Job ${jobNum}&body=${encodeURIComponent(body)}`;
+
+}
+
+function emailWeeklyJobs(){
+
+  let body='';
+
+  jobs.forEach(j=>{
+
+    body +=
+`JOB ${j.jobNumber}
+
+${j.partNumber}
+
+Qty Used: ${j.qtyUsed}
+
+${j.date}
+
+-------------------
+
+`;
+
+  });
+
+  window.location.href =
+`mailto:?subject=Weekly Job Report&body=${encodeURIComponent(body)}`;
+
+}
 init();
 </script>
 </body>
