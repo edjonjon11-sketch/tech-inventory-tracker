@@ -2409,40 +2409,88 @@ Qty: ${p.qty}
 
 function emailSelectedJobs(){
 
-  let jobNum =
-  prompt('Enter Job Number');
-
-  if(!jobNum) return;
-
-  const selected =
-  jobs.filter(
-    j=>j.jobNumber===jobNum
+  const checked =
+  document.querySelectorAll(
+    '.jobCheckbox:checked'
   );
 
-  if(selected.length===0){
+  if(checked.length===0){
 
-    alert('Job not found');
+    alert(
+      'Select at least one job.'
+    );
 
     return;
 
   }
 
-  let body='';
+  let body =
+  'SELECTED JOB REPORT\n\n';
 
-  selected.forEach(j=>{
+  checked.forEach(box=>{
+
+    const jobNum =
+    box.value;
+
+    const selectedJobs =
+    jobs.filter(
+      j=>j.jobNumber===jobNum
+    );
+
+    if(selectedJobs.length===0)
+      return;
+
+    const first =
+    selectedJobs[0];
 
     body +=
-`${j.partNumber}
-${j.description}
-Qty Used: ${j.qtyUsed}
-Date: ${j.date}
+`
+================================================
+
+JOB #${jobNum}
+
+Customer:
+${first.customer || 'N/A'}
+
+Job Type:
+${first.jobType || 'N/A'}
+
+Technician:
+${first.techName || ''}
+
+Date:
+${first.date}
+
+PARTS USED
 
 `;
 
+    selectedJobs.forEach(j=>{
+
+      body +=
+`
+${j.partNumber}
+
+${j.description}
+
+Qty Used:
+${j.qtyUsed}
+
+`;
+
+    });
+
+    body +=
+`
+Notes:
+
+${first.notes || 'None'}
+
+`;
   });
 
   window.location.href =
-`mailto:?subject=Job ${jobNum}&body=${encodeURIComponent(body)}`;
+`mailto:?subject=Selected Job Report&body=${encodeURIComponent(body)}`;
 
 }
 
