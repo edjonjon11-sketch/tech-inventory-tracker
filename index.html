@@ -2038,7 +2038,16 @@ Edit
 
     div.innerHTML=
 `
-<div onclick="toggleJob('${jobNum}')" style="cursor:pointer;">
+<div style="display:flex;gap:10px;align-items:flex-start;">
+
+<input
+type="checkbox"
+class="jobCheckbox"
+value="${jobNum}">
+
+<div
+onclick="toggleJob('${jobNum}')"
+style="cursor:pointer;flex:1;">
 
   <b>Job #${jobNum}</b>
 
@@ -2070,6 +2079,9 @@ font-weight:bold;
 </div>
 ` : ''}
 
+</div>
+
+</div>
 </div>
 
 <div id="job-${jobNum}" style="display:none;margin-top:12px;">
