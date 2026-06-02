@@ -197,6 +197,22 @@ onclick="addNewPart()">
 + Add New Part
 
 </button>
+<button
+class="btn good"
+onclick="openReplenishment()">
+
++ Replenishment
+
+</button>
+
+<button
+class="btn secondary"
+onclick="openAdjustment()">
+
+Inventory Adjustment
+
+</button>
+  
   <div id="inventoryList"></div>
 </section>
 
@@ -635,6 +651,71 @@ function addNewPart(){
 
   alert(
     `${partNumber} added successfully.`
+  );
+
+}
+
+  function openReplenishment(){
+
+  const part =
+  prompt("Enter Part Number");
+
+  if(!part) return;
+
+  const qty =
+  Number(
+    prompt("Qty Received")
+  );
+
+  if(!qty || qty < 1) return;
+
+  const item =
+  parts.find(
+    p =>
+    p.partNumber.toUpperCase() ===
+    part.toUpperCase()
+  );
+
+  if(!item){
+
+    alert("Part not found");
+
+    return;
+
+  }
+
+  item.qty =
+  Number(item.qty) + qty;
+
+  inventoryUpdates.unshift({
+
+    date:
+    new Date().toLocaleString(),
+
+    type:
+    "Replenishment",
+
+    tech:
+    currentTechId,
+
+    items:[{
+
+      partNumber:
+      item.partNumber,
+
+      qtyAdded:
+      qty
+
+    }]
+
+  });
+
+  save();
+
+  renderAll();
+
+  alert(
+    `${qty} added to ${item.partNumber}`
   );
 
 }
@@ -2150,11 +2231,15 @@ onclick="toggleUpdate(${i})"
 style="cursor:pointer;">
 
 <b>
-Inventory Scan
+${u.type || 'Inventory Scan'}
 </b>
 
 <div class="small">
 ${u.date}
+</div>
+
+<div class="small">
+Tech: ${u.tech || ''}
 </div>
 
 <div class="small">
