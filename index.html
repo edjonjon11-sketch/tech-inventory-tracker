@@ -1372,32 +1372,38 @@ new Set(jobs.map(j=>j.jobNumber)).size;
 
         let qty = 0;
 
-        for(let j=i;j<=i+2;j++){
+const partDigits =
+cleanPart.replace(/\D/g,'');
 
-          if(!lines[j]) continue;
+for(let j=i;j<=i+3;j++){
 
-          const nums =
-          lines[j].match(/\d+/g);
+  if(!lines[j]) continue;
 
-          if(nums){
+  const nums =
+  lines[j].match(/\d+/g);
 
-            nums.forEach(n=>{
+  if(nums){
 
-              const val =
-              Number(n);
+    nums.forEach(n=>{
 
-              if(
-                val > 0 &&
-                val < 500
-              ){
-                qty = val;
-              }
+      const val =
+      Number(n);
 
-            });
+      if(
+        val >= 0 &&
+        val <= 500 &&
+        String(val) !== partDigits
+      ){
 
-          }
+        qty = val;
 
-        }
+      }
+
+    });
+
+  }
+
+}
 
         if(qty > 0){
 
