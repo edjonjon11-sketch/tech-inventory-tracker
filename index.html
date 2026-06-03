@@ -2455,40 +2455,27 @@ Qty: ${p.qty}
 
 function emailSelectedJobs(){
 
- if(selectedJobs.length===0){
+  if(selectedJobs.length === 0){
 
-  alert('Select at least one job.');
-
-  return;
-
-} 
-
-    alert(
-      'Select at least one job.'
-    );
+    alert('Select at least one job.');
 
     return;
 
   }
 
-  let body =
-  'SELECTED JOB REPORT\n\n';
+  let body = 'SELECTED JOB REPORT\n\n';
 
   selectedJobs.forEach(jobNum=>{
 
-    const selectedJobs =
-    jobs.filter(
-      j=>j.jobNumber===jobNum
+    const jobItems = jobs.filter(
+      j => j.jobNumber === jobNum
     );
 
-    if(selectedJobs.length===0)
-      return;
+    if(jobItems.length === 0) return;
 
-    const first =
-    selectedJobs[0];
+    const first = jobItems[0];
 
-    body +=
-`
+    body += `
 ================================================
 
 JOB #${jobNum}
@@ -2509,10 +2496,9 @@ PARTS USED
 
 `;
 
-    selectedJobs.forEach(j=>{
+    jobItems.forEach(j=>{
 
-      body +=
-`
+      body += `
 ${j.partNumber}
 
 ${j.description}
@@ -2524,13 +2510,13 @@ ${j.qtyUsed}
 
     });
 
-    body +=
-`
+    body += `
 Notes:
 
 ${first.notes || 'None'}
 
 `;
+
   });
 
   window.location.href =
