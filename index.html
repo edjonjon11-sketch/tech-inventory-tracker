@@ -2036,7 +2036,7 @@ Edit
 
     div.className='card';
 
-    div.innerHTML=
+    div.innerHTML=`
 <div style="
 display:flex;
 align-items:flex-start;
@@ -2055,11 +2055,13 @@ flex-shrink:0;
 ">
 
 <div
-onclick="toggleJob('${jobNum}')"
 style="
-cursor:pointer;
 flex:1;
 ">
+
+<div
+onclick="toggleJob('${jobNum}')"
+style="cursor:pointer;">
 
 <b>Job #${jobNum}</b>
 
@@ -2098,7 +2100,7 @@ font-weight:bold;
 </div>
 
 </div>
-
+</div>
 <div id="job-${jobNum}" style="display:none;margin-top:12px;">
 
   ${partsHTML}
