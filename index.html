@@ -537,6 +537,9 @@ parts.forEach(p=>{
   }
 
 });
+let selectedJobs = JSON.parse(
+  localStorage.getItem('tti_selectedJobs') || '[]'
+);
 let jobs = JSON.parse(localStorage.getItem('tti_jobs') || '[]');
 let transfers = JSON.parse(localStorage.getItem('tti_transfers') || '[]');
 let actualInventory = [];
@@ -2047,6 +2050,8 @@ gap:10px;
 type="checkbox"
 class="jobCheckbox"
 value="${jobNum}"
+${selectedJobs.includes(jobNum) ? 'checked' : ''}
+onchange="toggleJobSelection('${jobNum}',this.checked)"
 style="
 width:22px;
 height:22px;
@@ -2318,6 +2323,30 @@ function openAdjustment(){
   );
 
 }
+
+  function toggleJobSelection(jobNum,isChecked){
+
+  if(isChecked){
+
+    if(!selectedJobs.includes(jobNum)){
+      selectedJobs.push(jobNum);
+    }
+
+  }else{
+
+    selectedJobs =
+      selectedJobs.filter(
+        j => j !== jobNum
+      );
+
+  }
+
+  localStorage.setItem(
+    'tti_selectedJobs',
+    JSON.stringify(selectedJobs)
+  );
+
+}
   
  function emailReport(){
 
@@ -2426,12 +2455,13 @@ Qty: ${p.qty}
 
 function emailSelectedJobs(){
 
-  const checked =
-  document.querySelectorAll(
-    '.jobCheckbox:checked'
-  );
+ if(selectedJobs.length===0){
 
-  if(checked.length===0){
+  alert('Select at least one job.');
+
+  return;
+
+} 
 
     alert(
       'Select at least one job.'
@@ -2444,10 +2474,7 @@ function emailSelectedJobs(){
   let body =
   'SELECTED JOB REPORT\n\n';
 
-  checked.forEach(box=>{
-
-    const jobNum =
-    box.value;
+  selectedJobs.forEach(jobNum=>{
 
     const selectedJobs =
     jobs.filter(
