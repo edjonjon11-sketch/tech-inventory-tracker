@@ -947,18 +947,6 @@ function toggleSummary(id,arrowId){
   }
 
 }
-  
-function deleteJob(jobNum){
-
-  if(!confirm('Delete this entire job history?')) return;
-
-  jobs = jobs.filter(j=>j.jobNumber !== jobNum);
-
-  save();
-
-  renderJobs();
-
-}
 
 function emailTransfers(){
 
