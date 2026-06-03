@@ -2037,26 +2037,47 @@ Edit
     div.className='card';
 
     div.innerHTML=
-`
 <div style="
 display:flex;
-align-items:center;
+align-items:flex-start;
 gap:10px;
 ">
 
-  <b>Job #${jobNum}</b>
+<input
+type="checkbox"
+class="jobCheckbox"
+value="${jobNum}"
+style="
+width:22px;
+height:22px;
+margin-top:4px;
+flex-shrink:0;
+">
 
-  <div class="small">
-    Customer: ${first.customer || 'No customer entered'}
-  </div>
+<div
+onclick="toggleJob('${jobNum}')"
+style="
+cursor:pointer;
+flex:1;
+">
 
-  <div class="small">
-    Created: ${first.date}
-  </div>
+<b>Job #${jobNum}</b>
 
-  <div class="small">
-    Tap To Expand
-  </div>
+<div class="small">
+Customer: ${first.customer || 'No customer entered'}
+</div>
+
+<div class="small">
+Job Type: ${first.jobType || 'N/A'}
+</div>
+
+<div class="small">
+Created: ${first.date}
+</div>
+
+<div class="small">
+Tap To Expand
+</div>
 
 ${items.some(x => x.notes && x.notes.trim() !== '') ? `
 <div
@@ -2076,7 +2097,6 @@ font-weight:bold;
 
 </div>
 
-</div>
 </div>
 
 <div id="job-${jobNum}" style="display:none;margin-top:12px;">
