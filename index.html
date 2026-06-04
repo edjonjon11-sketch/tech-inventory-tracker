@@ -2451,7 +2451,13 @@ function emailSelectedJobs(){
 
   }
 
-  let body = 'SELECTED JOB REPORT\n\n';
+  let body = `WEEKLY JOBS AND PARTS
+
+Technician: ${currentTechId || 'N/A'}
+
+================================================
+
+`;
 
   selectedJobs.forEach(jobNum=>{
 
@@ -2508,7 +2514,7 @@ ${first.notes || 'None'}
   });
 
   window.location.href =
-`mailto:?subject=Selected Job Report&body=${encodeURIComponent(body)}`;
+`mailto:?subject=Weekly Jobs and Parts&body=${encodeURIComponent(body)}`;
 
 }
 
