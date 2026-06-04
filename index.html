@@ -1391,7 +1391,6 @@ function init(){
 
 }
 
-}
 function renderAll(){
 
   renderStats();
@@ -2546,37 +2545,60 @@ ${first.notes || 'None'}
 }
 
 function emailWeeklyJobs(){
+
   if(!currentTechId){
 
-  alert(
-    'Please save your Technician ID first.'
-  );
+    alert('Please save your Technician ID first.');
 
-  return;
+    showScreen('home');
 
-}
+    return;
 
-  let body='';
+  }
+
+  let body =
+`WEEKLY JOBS AND PARTS
+
+Technician: ${currentTechId}
+
+================================================
+
+`;
 
   jobs.forEach(j=>{
 
     body +=
-`JOB ${j.jobNumber}
+`
+JOB #${j.jobNumber}
 
-${j.partNumber}
+Customer:
+${j.customer || 'N/A'}
 
-Qty Used: ${j.qtyUsed}
+Job Type:
+${j.jobType || 'N/A'}
 
+Technician:
+${j.techName || currentTechId}
+
+Date:
 ${j.date}
 
--------------------
+PART USED:
+${j.partNumber}
+
+${j.description}
+
+Qty Used:
+${j.qtyUsed}
+
+----------------------------
 
 `;
 
   });
 
   window.location.href =
-`mailto:?subject=Weekly Job Report&body=${encodeURIComponent(body)}`;
+`mailto:?subject=Weekly Jobs and Parts&body=${encodeURIComponent(body)}`;
 
 }
 init();
