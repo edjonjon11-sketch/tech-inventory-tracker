@@ -1365,22 +1365,31 @@ alert('Reconciliation cleared.');
   function saveTechId(){
 
   currentTechId =
-document.getElementById(
-'techIdInput'
-).value.trim();
+  document.getElementById(
+    'techIdInput'
+  ).value.trim().toUpperCase();
 
   localStorage.setItem(
     'tti_techId',
     currentTechId
   );
 
-  alert('Technician ID saved.');
+  alert(
+    'Technician ID saved: ' +
+    currentTechId
+  );
 
 }
   
 function init(){
 
+  document.getElementById(
+    'techIdInput'
+  ).value = currentTechId;
+
   renderAll();
+
+}
 
 }
 function renderAll(){
@@ -2422,6 +2431,15 @@ ${jobsText}
 } 
 
   function emailInventoryOnly(){
+    if(!currentTechId){
+
+  alert(
+    'Please save your Technician ID first.'
+  );
+
+  return;
+
+}
 
   let inventoryText='';
 
@@ -2442,6 +2460,15 @@ Qty: ${p.qty}
 }
 
 function emailSelectedJobs(){
+  if(!currentTechId){
+
+  alert(
+    'Please save your Technician ID first.'
+  );
+
+  return;
+
+}
 
   if(selectedJobs.length === 0){
 
@@ -2519,6 +2546,15 @@ ${first.notes || 'None'}
 }
 
 function emailWeeklyJobs(){
+  if(!currentTechId){
+
+  alert(
+    'Please save your Technician ID first.'
+  );
+
+  return;
+
+}
 
   let body='';
 
