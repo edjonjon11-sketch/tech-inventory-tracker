@@ -2075,8 +2075,17 @@ Job Type: ${first.jobType || 'N/A'}
 </div>
 
 <div class="small">
-Created: ${first.date}
+Completed Date: ${first.date}
 </div>
+
+<button
+class="btn secondary"
+style="width:auto;padding:6px 10px;margin-top:6px;"
+onclick="editJobDate('${jobNum}')">
+
+Edit Date
+
+</button>
 
 <div class="small">
 Tap To Expand
@@ -2341,6 +2350,33 @@ function openAdjustment(){
     'tti_selectedJobs',
     JSON.stringify(selectedJobs)
   );
+
+}
+
+function editJobDate(jobNum){
+
+  const jobItems =
+  jobs.filter(j=>j.jobNumber===jobNum);
+
+  if(jobItems.length===0) return;
+
+  const newDate =
+  prompt(
+    'Enter completed date',
+    jobItems[0].date
+  );
+
+  if(!newDate) return;
+
+  jobItems.forEach(j=>{
+    j.date = newDate;
+  });
+
+  save();
+
+  renderAll();
+
+  alert('Job date updated.');
 
 }
   
