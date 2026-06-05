@@ -36,7 +36,7 @@ right:0;
 background:#08192b;
 border-top:1px solid #203b5c;
 display:grid;
-grid-template-columns:repeat(7,1fr);
+grid-template-columns:repeat(8,1fr);
 z-index:10
 }
 nav button{background:none;border:0;color:#b9d3f5;padding:10px 3px;font-size:12px}
@@ -487,6 +487,9 @@ Apply Replenishment
 <nav>
   <button id="nav-summary" onclick="showScreen('summary')">Summary</button>
   <button id="nav-home" class="active" onclick="showScreen('home')">Home</button>
+  <button id="nav-replenishment" onclick="showScreen('replenishment')">
+Replenish
+</button>
   <button id="nav-inventory" onclick="showScreen('inventory')">Inventory</button>
   <button id="nav-job" onclick="showScreen('job')">Job</button>
   <button
@@ -587,6 +590,7 @@ localStorage.getItem(
 ) || '[]'
 );
 let selectedCategory = '';
+let replenishItems = [];
   function save(){
 
   localStorage.setItem(
@@ -1407,6 +1411,172 @@ alert('Reconciliation cleared.');
     'Technician ID saved: ' +
     currentTechId
   );
+
+}
+
+function loadReplenishCategories(){
+
+  const sel = document.getElementById('replenishCategory');
+
+  if(!sel) return;
+
+  sel.innerHTML = '';
+
+  const cats =
+  [...new Set(parts.map(p=>p.category))].sort();
+
+  cats.forEach(c=>{
+
+    let o = document.createElement('option');
+    o.value = c;
+    o.textContent = c;
+    sel.appendChild(o);
+
+  });
+
+  loadReplenishParts();
+
+}
+
+function loadReplenishParts(){
+
+  const cat =
+  document.getElementById('replenishCategory')?.value;
+
+  const partSel =
+  document.getElementById('replenishPart');
+
+  if(!partSel) return;
+
+  partSel.innerHTML = '';
+
+  parts
+  .filter(p=>p.category === cat)
+  .forEach((p,i)=>{
+
+    let o = document.createElement('option');
+    o.value = parts.indexOf(p);
+    o.textContent =
+    `${p.partNumber} - ${p.description} (Qty ${p.qty})`;
+
+    partSel.appendChild(o);
+
+  });
+
+}
+
+function addReplenishItem(){
+
+  const index =
+  Number(document.getElementById('replenishPart').value);
+
+  const qty =
+  Number(document.getElementById('replenishQty').value) || 0;
+
+  if(qty < 1){
+    alert('Enter quantity added.');
+    return;
+  }
+
+  const p = parts[index];
+
+  if(!p) return;
+
+  replenishItems.push({
+    index,
+    partNumber:p.partNumber,
+    description:p.description,
+    qtyAdded:qty
+  });
+
+  renderReplenishList();
+
+}
+
+function renderReplenishList(){
+
+  const box =
+  document.getElementById('replenishList');
+
+  if(!box) return;
+
+  box.innerHTML = '';
+
+  if(replenishItems.length === 0){
+    box.innerHTML =
+    '<div class="small">No parts added yet.</div>';
+    return;
+  }
+
+  replenishItems.forEach((item,i)=>{
+
+    let d = document.createElement('div');
+    d.className = 'item';
+
+    d.innerHTML =
+    `<div>
+      <b>${item.partNumber}</b>
+      <div class="small">${item.description}</div>
+    </div>
+    <span class="badge ok">+${item.qtyAdded}</span>`;
+
+    box.appendChild(d);
+
+  });
+
+}
+
+function applyReplenishment(){
+
+  if(!currentTechId){
+    alert('Please save your Technician ID first.');
+    showScreen('home');
+    return;
+  }
+
+  if(replenishItems.length === 0){
+    alert('Add at least one part first.');
+    return;
+  }
+
+  let historyItems = [];
+
+  replenishItems.forEach(item=>{
+
+    const p = parts[item.index];
+
+    if(!p) return;
+
+    const oldQty = Number(p.qty);
+
+    p.qty = oldQty + Number(item.qtyAdded);
+
+    historyItems.push({
+      partNumber:p.partNumber,
+      description:p.description,
+      oldQty,
+      qtyAdded:item.qtyAdded,
+      qty:p.qty
+    });
+
+  });
+
+  inventoryUpdates.unshift({
+    date:new Date().toLocaleString(),
+    type:'Replenishment',
+    tech:currentTechId,
+    items:historyItems
+  });
+
+  replenishItems = [];
+
+  save();
+
+  renderAll();
+
+  alert('Replenishment applied.');
+
+  showScreen('updates');
 
 }
   
