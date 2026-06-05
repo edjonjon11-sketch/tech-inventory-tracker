@@ -196,10 +196,9 @@ onclick="addNewPart()">
 
 + Add New Part
 
-</button>
 <button
 class="btn good"
-onclick="openReplenishment()">
+onclick="showScreen('replenishment')">
 
 + Replenishment
 
@@ -455,6 +454,36 @@ style="display:none;margin-top:12px;">
 </div>
 </section>
 
+  <section id="replenishment" class="screen">
+
+<h2>Inventory Replenishment</h2>
+
+<div class="card">
+<label>Category</label>
+<select id="replenishCategory" onchange="loadReplenishParts()"></select>
+
+<label>Part</label>
+<select id="replenishPart"></select>
+
+<label>Quantity Added</label>
+<input id="replenishQty" type="number" value="1">
+
+<button class="btn good" onclick="addReplenishItem()">
+Add To Replenishment
+</button>
+</div>
+
+<div class="card">
+<h2>Current Replenishment</h2>
+<div id="replenishList"></div>
+
+<button class="btn good" onclick="applyReplenishment()">
+Apply Replenishment
+</button>
+</div>
+
+</section>
+  
 <nav>
   <button id="nav-summary" onclick="showScreen('summary')">Summary</button>
   <button id="nav-home" class="active" onclick="showScreen('home')">Home</button>
