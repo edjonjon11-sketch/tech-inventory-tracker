@@ -618,11 +618,33 @@ localStorage.setItem(
 
 }
 function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-  document.getElementById('nav-'+id).classList.add('active');
+
+  document
+  .querySelectorAll('.screen')
+  .forEach(s=>s.classList.remove('active'));
+
+  document
+  .getElementById(id)
+  .classList.add('active');
+
+  document
+  .querySelectorAll('nav button')
+  .forEach(b=>b.classList.remove('active'));
+
+  document
+  .getElementById('nav-'+id)
+  .classList.add('active');
+
+  if(id === 'replenishment'){
+
+    loadReplenishCategories();
+
+    renderReplenishList();
+
+  }
+
   renderAll();
+
 }
 function renderTransferParts(){
 
@@ -1585,6 +1607,10 @@ function init(){
   document.getElementById(
     'techIdInput'
   ).value = currentTechId;
+
+  loadReplenishCategories();
+
+  renderReplenishList();
 
   renderAll();
 
