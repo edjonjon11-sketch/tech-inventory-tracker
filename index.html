@@ -2159,15 +2159,19 @@ function renderJobs(){
   
   const grouped={};
 
-  jobs.forEach(j=>{
+  const sortedJobs = [...jobs].sort(
+  (a,b) => new Date(b.date) - new Date(a.date)
+);
 
-    if(!grouped[j.jobNumber]){
-      grouped[j.jobNumber]=[];
-    }
+sortedJobs.forEach(j=>{
 
-    grouped[j.jobNumber].push(j);
+  if(!grouped[j.jobNumber]){
+    grouped[j.jobNumber]=[];
+  }
 
-  });
+  grouped[j.jobNumber].push(j);
+
+});
 
   Object.keys(grouped).forEach(jobNum=>{
 
