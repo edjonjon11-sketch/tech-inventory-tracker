@@ -1505,15 +1505,15 @@ function addReplenishItem(){
   if(!p) return;
 
   replenishItems.push({
-    index,
-    partNumber:p.partNumber,
-    description:p.description,
-    qtyAdded:qty
-  });
+  index,
+  partNumber:p.partNumber,
+  description:p.description,
+  qtyAdded:qty
+});
 
-  renderReplenishList();
+renderReplenishList();
 
-}
+document.getElementById('replenishQty').value = 1;
 
 function renderReplenishList(){
 
