@@ -196,6 +196,8 @@ onclick="addNewPart()">
 
 + Add New Part
 
+</button>
+
 <button
 class="btn good"
 onclick="showScreen('replenishment')">
@@ -619,31 +621,28 @@ localStorage.setItem(
 }
 function showScreen(id){
 
-  document
-  .querySelectorAll('.screen')
+  document.querySelectorAll('.screen')
   .forEach(s=>s.classList.remove('active'));
 
-  document
-  .getElementById(id)
-  .classList.add('active');
+  const screen = document.getElementById(id);
+  if(screen){
+    screen.classList.add('active');
+  }
 
-  document
-  .querySelectorAll('nav button')
+  document.querySelectorAll('nav button')
   .forEach(b=>b.classList.remove('active'));
 
-  document
-  .getElementById('nav-'+id)
-  .classList.add('active');
-
-  if(id === 'replenishment'){
-
-    loadReplenishCategories();
-
-    renderReplenishList();
-
+  const nav = document.getElementById('nav-' + id);
+  if(nav){
+    nav.classList.add('active');
   }
 
   renderAll();
+
+  if(id === 'replenishment'){
+    loadReplenishCategories();
+    renderReplenishList();
+  }
 
 }
 function renderTransferParts(){
