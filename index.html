@@ -1502,18 +1502,23 @@ function addReplenishItem(){
 
   const p = parts[index];
 
-  if(!p) return;
+  if(!p){
+    alert('Select a part first.');
+    return;
+  }
 
   replenishItems.push({
-  index,
-  partNumber:p.partNumber,
-  description:p.description,
-  qtyAdded:qty
-});
+    index:index,
+    partNumber:p.partNumber,
+    description:p.description,
+    qtyAdded:qty
+  });
 
-renderReplenishList();
+  renderReplenishList();
 
-document.getElementById('replenishQty').value = 1;
+  document.getElementById('replenishQty').value = 1;
+
+}
 
 function renderReplenishList(){
 
