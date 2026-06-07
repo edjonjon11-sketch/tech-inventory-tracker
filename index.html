@@ -2159,9 +2159,17 @@ function renderJobs(){
   
   const grouped={};
 
-  const sortedJobs = [...jobs].sort(
-  (a,b) => new Date(b.date) - new Date(a.date)
-);
+  const sortedJobs = [...jobs].sort((a,b)=>{
+
+  const dateA = Date.parse(a.date);
+  const dateB = Date.parse(b.date);
+
+  if(isNaN(dateA)) return 1;
+  if(isNaN(dateB)) return -1;
+
+  return dateB - dateA;
+
+});
 
 sortedJobs.forEach(j=>{
 
