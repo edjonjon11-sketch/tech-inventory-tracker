@@ -609,6 +609,9 @@ const defaultParts = [
 {"category":"MISC","partNumber":"DWPCOVER-SR","description":"Shock Color Cover","qty":1,"minQty":1,"notes":""},
 {"category":"MISC","partNumber":"ADTPLUS-YS-R0-29","description":"Live Light Smart Sign","qty":1,"minQty":1,"notes":""}
 ];
+let menuOpen=false;
+let currentTech =
+  localStorage.getItem("currentTech") || "";
 let parts = JSON.parse(localStorage.getItem('tti_parts') || JSON.stringify(defaultParts))
 parts.forEach(p=>{
 
