@@ -547,6 +547,16 @@ min-height:90px;
 "></textarea>
 
 <button
+class="btn secondary"
+onclick="addCorrectionToQueue()">
+
+Add To Queue
+
+</button>
+
+<div id="correctionQueueList"></div>
+  
+<button
 class="btn good"
 onclick="emailCorrection()">
 Email Correction
@@ -713,6 +723,7 @@ localStorage.getItem(
 );
 let selectedCategory = '';
 let replenishItems = [];
+let correctionQueue = [];
   function save(){
 
   localStorage.setItem(
@@ -3063,42 +3074,157 @@ ${j.qtyUsed}
   }
 
 }
+  function removeCorrection(i){
+
+  correctionQueue.splice(i,1);
+
+  renderCorrectionQueue();
+
+}
 function emailCorrection(){
 
-  const body =
+  if(correctionQueue.length===0){
 
-`PARTS CORRECTION REQUEST
+    alert(
+      'Add at least one correction.'
+    );
 
-JOB NUMBER:
-${document.getElementById('corrJob').value}
+    return;
+  }
 
-REMOVE PART:
-${document.getElementById('corrRemove').value}
+  let body =
 
-REMOVE QTY:
-${document.getElementById('corrRemoveQty').value}
-
-ADD PART:
-${document.getElementById('corrAdd').value}
-
-ADD QTY:
-${document.getElementById('corrAddQty').value}
-
-REASON:
-${document.getElementById('correctionReason').value}
-
-NOTES:
-${document.getElementById('correctionNotes').value}
+`PARTS CORRECTION REPORT
 
 TECH:
 ${currentTechId}
 
 DATE:
 ${new Date().toLocaleString()}
+
+================================
+
 `;
 
+  correctionQueue.forEach(c=>{
+
+    body +=
+
+`
+JOB:
+${c.job}
+
+REMOVE:
+${c.removePart}
+
+REMOVE QTY:
+${c.removeQty}
+
+ADD:
+${c.addPart}
+
+ADD QTY:
+${c.addQty}
+
+REASON:
+${c.reason}
+
+NOTES:
+${c.notes}
+
+--------------------------------
+
+`;
+
+  });
+
   window.location.href =
-  `mailto:?subject=Parts Correction Request&body=${encodeURIComponent(body)}`;
+`mailto:?subject=Parts Correction Report&body=${encodeURIComponent(body)}`;
+
+}
+  function addCorrectionToQueue(){
+
+  correctionQueue.push({
+
+    job:
+      document.getElementById('corrJob').value,
+
+    removePart:
+      document.getElementById('corrRemove').value,
+
+    removeQty:
+      document.getElementById('corrRemoveQty').value,
+
+    addPart:
+      document.getElementById('corrAdd').value,
+
+    addQty:
+      document.getElementById('corrAddQty').value,
+
+    reason:
+      document.getElementById('correctionReason').value,
+
+    notes:
+      document.getElementById('correctionNotes').value
+
+  });
+
+  renderCorrectionQueue();
+
+  alert('Added to correction queue.');
+
+}
+  function renderCorrectionQueue(){
+
+  const box =
+    document.getElementById(
+      'correctionQueueList'
+    );
+
+  if(!box) return;
+
+  box.innerHTML='';
+
+  correctionQueue.forEach((c,i)=>{
+
+    let div =
+      document.createElement('div');
+
+    div.className='card';
+
+    div.innerHTML=`
+
+<b>Job ${c.job}</b>
+
+<div class="small">
+Remove:
+${c.removePart}
+(${c.removeQty})
+</div>
+
+<div class="small">
+Add:
+${c.addPart}
+(${c.addQty})
+</div>
+
+<div class="small">
+${c.reason}
+</div>
+
+<button
+class="btn danger"
+onclick="removeCorrection(${i})">
+
+Delete
+
+</button>
+
+`;
+
+    box.appendChild(div);
+
+  });
 
 }
 init();
