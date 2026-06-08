@@ -491,6 +491,70 @@ Apply Replenishment
 </div>
 
 </section>
+
+<section id="corrections" class="screen">
+
+<h2>Parts Correction Request</h2>
+
+<div class="card">
+
+<label>Job Number</label>
+<input id="corrJob">
+
+<label>Remove Part</label>
+<input id="corrRemove">
+
+<label>Remove Qty</label>
+<input id="corrRemoveQty" type="number" value="1">
+
+<label>Add Part</label>
+<input id="corrAdd">
+
+<label>Add Qty</label>
+<input id="corrAddQty" type="number" value="1">
+
+<label>Reason</label>
+
+<select id="correctionReason">
+
+<option>Didn't Have Part On Truck</option>
+<option>Wrong Part Installed</option>
+<option>Closed Job Too Soon</option>
+<option>Forgot To Swap Part</option>
+<option>Presale Order Changed</option>
+<option>Customer Changed Equipment</option>
+<option>Sales Changed Scope</option>
+<option>Additional Equipment Installed</option>
+<option>Equipment Removed From Job</option>
+<option>Inventory Adjustment Required</option>
+<option>Warranty Replacement</option>
+<option>Return Visit Changed Equipment</option>
+<option>Other</option>
+
+</select>
+
+<label>Additional Notes</label>
+
+<textarea
+id="correctionNotes"
+style="
+width:100%;
+padding:12px;
+border-radius:12px;
+background:#08192b;
+color:white;
+min-height:90px;
+"></textarea>
+
+<button
+class="btn good"
+onclick="emailCorrection()">
+Email Correction
+</button>
+
+</div>
+
+</section>
   
 <nav>
 
@@ -554,6 +618,11 @@ onclick="showScreen('transfers');toggleMoreMenu();">
 🚚 Transfers
 </button>
 
+<button class="btn secondary"
+onclick="showScreen('corrections');toggleMoreMenu();">
+🔄 Corrections
+</button>
+  
 </div>
 <script>
 const defaultParts = [
@@ -2992,6 +3061,44 @@ ${j.qtyUsed}
     menu.style.display = 'block';
 
   }
+
+}
+function emailCorrection(){
+
+  const body =
+
+`PARTS CORRECTION REQUEST
+
+JOB NUMBER:
+${document.getElementById('corrJob').value}
+
+REMOVE PART:
+${document.getElementById('corrRemove').value}
+
+REMOVE QTY:
+${document.getElementById('corrRemoveQty').value}
+
+ADD PART:
+${document.getElementById('corrAdd').value}
+
+ADD QTY:
+${document.getElementById('corrAddQty').value}
+
+REASON:
+${document.getElementById('correctionReason').value}
+
+NOTES:
+${document.getElementById('correctionNotes').value}
+
+TECH:
+${currentTechId}
+
+DATE:
+${new Date().toLocaleString()}
+`;
+
+  window.location.href =
+  `mailto:?subject=Parts Correction Request&body=${encodeURIComponent(body)}`;
 
 }
 init();
