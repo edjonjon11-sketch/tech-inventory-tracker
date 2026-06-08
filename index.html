@@ -36,7 +36,7 @@ right:0;
 background:#08192b;
 border-top:1px solid #203b5c;
 display:grid;
-grid-template-columns:repeat(8,1fr);
+grid-template-columns:repeat(5,1fr);
 z-index:10
 }
 nav button{background:none;border:0;color:#b9d3f5;padding:10px 3px;font-size:12px}
@@ -493,26 +493,68 @@ Apply Replenishment
 </section>
   
 <nav>
-  <button id="nav-summary" onclick="showScreen('summary')">Summary</button>
-  <button id="nav-home" class="active" onclick="showScreen('home')">Home</button>
-  <button id="nav-replenishment" onclick="showScreen('replenishment')">
-Replenish
-</button>
-  <button id="nav-inventory" onclick="showScreen('inventory')">Inventory</button>
-  <button id="nav-job" onclick="showScreen('job')">Job</button>
-  <button
-id="nav-updates"
-onclick="showScreen('updates')">
 
-Updates
+<button id="nav-home"
+class="active"
+onclick="showScreen('home')">
+🏠 Home
+</button>
 
+<button id="nav-job"
+onclick="showScreen('job')">
+📋 Jobs
 </button>
-  <button id="nav-alerts" onclick="showScreen('alerts')">Alerts</button>
-  <button id="nav-transfers" onclick="showScreen('transfers')">
-Transfers
+
+<button id="nav-inventory"
+onclick="showScreen('inventory')">
+📦 Inventory
 </button>
+
+<button id="nav-alerts"
+onclick="showScreen('alerts')">
+🚨 Alerts
+</button>
+
+<button onclick="toggleMoreMenu()">
+☰ More
+</button>
+
 </nav>
+<div id="moreMenu"
+style="
+display:none;
+position:fixed;
+bottom:70px;
+right:10px;
+background:#0f2137;
+border:1px solid #203b5c;
+border-radius:16px;
+padding:10px;
+z-index:999;
+width:220px;
+">
 
+<button class="btn secondary"
+onclick="showScreen('summary');toggleMoreMenu();">
+📊 Summary
+</button>
+
+<button class="btn secondary"
+onclick="showScreen('replenishment');toggleMoreMenu();">
+🔄 Replenishment
+</button>
+
+<button class="btn secondary"
+onclick="showScreen('updates');toggleMoreMenu();">
+📝 Updates
+</button>
+
+<button class="btn secondary"
+onclick="showScreen('transfers');toggleMoreMenu();">
+🚚 Transfers
+</button>
+
+</div>
 <script>
 const defaultParts = [
 {"category":"COMMAND","partNumber":"ADT7AIO-5","description":"ADT AIO 7in WIFI/ZWAVE","qty":7,"minQty":1,"notes":""},
@@ -2882,6 +2924,22 @@ ${j.qtyUsed}
 
   window.location.href =
 `mailto:?subject=Weekly Jobs and Parts&body=${encodeURIComponent(body)}`;
+
+}
+  function toggleMoreMenu(){
+
+  const menu =
+  document.getElementById('moreMenu');
+
+  if(menu.style.display === 'block'){
+
+    menu.style.display = 'none';
+
+  } else {
+
+    menu.style.display = 'block';
+
+  }
 
 }
 init();
