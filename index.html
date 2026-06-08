@@ -644,6 +644,28 @@ localStorage.getItem(
 );
 let selectedCategory = '';
 let replenishItems = [];
+  window.onload=function(){
+
+  if(!currentTech){
+
+    currentTech = prompt(
+      "Enter Your Tech Number (Example: TE170)"
+    );
+
+    if(currentTech){
+
+      currentTech =
+        currentTech.toUpperCase();
+
+      localStorage.setItem(
+        "currentTech",
+        currentTech
+      );
+    }
+  }
+
+  ...
+};
   function save(){
 
   localStorage.setItem(
@@ -1005,6 +1027,25 @@ Delete
 
 }
 
+function changeTechNumber(){
+
+  const tech =
+    prompt(
+      "Enter Tech Number"
+    );
+
+  if(!tech) return;
+
+  localStorage.setItem(
+    "currentTech",
+    tech.toUpperCase()
+  );
+
+  alert(
+    "Tech Number Saved"
+  );
+}
+  
 function toggleJob(jobNum){
 
   const box=document.getElementById('job-'+jobNum);
