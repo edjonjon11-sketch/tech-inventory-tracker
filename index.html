@@ -644,28 +644,6 @@ localStorage.getItem(
 );
 let selectedCategory = '';
 let replenishItems = [];
-  window.onload=function(){
-
-  if(!currentTech){
-
-    currentTech = prompt(
-      "Enter Your Tech Number (Example: TE170)"
-    );
-
-    if(currentTech){
-
-      currentTech =
-        currentTech.toUpperCase();
-
-      localStorage.setItem(
-        "currentTech",
-        currentTech
-      );
-    }
-  }
-
-  ...
-};
   function save(){
 
   localStorage.setItem(
@@ -1172,8 +1150,8 @@ ${t.from}
 TO:
 ${t.to}
 
-TECH:
-${t.techName || ''}
+TRANSFER TECH:
+${t.techName || currentTechId || ''}
 
 DATE:
 ${t.date}
@@ -1697,8 +1675,38 @@ function applyReplenishment(){
   showScreen('updates');
 
 }
+
+function requireTechId(){
+
+  if(!currentTechId){
+
+    currentTechId = prompt(
+      "Enter Your Tech Number (Example: TE170)"
+    );
+
+    if(currentTechId){
+
+      currentTechId =
+        currentTechId.trim().toUpperCase();
+
+      localStorage.setItem(
+        'tti_techId',
+        currentTechId
+      );
+
+    }else{
+
+      alert(
+        "Please save your Tech Number before using the app."
+      );
+
+    }
+  }
+}
   
 function init(){
+
+  requireTechId();
 
   document.getElementById(
     'techIdInput'
