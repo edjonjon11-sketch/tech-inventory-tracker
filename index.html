@@ -3210,7 +3210,40 @@ ${c.notes}
       document.getElementById('correctionNotes').value
 
   });
+const correction = correctionQueue[
+  correctionQueue.length - 1
+];
 
+inventoryUpdates.unshift({
+
+  date: new Date().toLocaleString(),
+
+  type: 'Inventory Correction',
+
+  tech: currentTechId,
+
+  items: [{
+
+    partNumber:
+      correction.removePart,
+
+    qty:
+      correction.removeQty,
+
+    addedPart:
+      correction.addPart,
+
+    addedQty:
+      correction.addQty,
+
+    reason:
+      correction.reason
+
+  }]
+
+});
+
+save();
   renderCorrectionQueue();
 
   alert('Added to correction queue.');
