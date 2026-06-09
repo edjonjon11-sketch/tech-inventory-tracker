@@ -2719,17 +2719,42 @@ function exportData(){
 
     u.items.forEach(item=>{
 
-      itemsHTML +=
-`
+      itemsHTML += `
 <div class="item">
 
 <div>
 
-<b>${item.partNumber}</b>
+<b>${item.partNumber || ''}</b>
 
+${item.job ? `
+<div class="small">
+Job: ${item.job}
+</div>
+` : ''}
+
+${item.qty ? `
 <div class="small">
 Qty Updated To: ${item.qty}
 </div>
+` : ''}
+
+${item.addedPart ? `
+<div class="small">
+Added Part: ${item.addedPart}
+</div>
+` : ''}
+
+${item.addedQty ? `
+<div class="small">
+Added Qty: ${item.addedQty}
+</div>
+` : ''}
+
+${item.reason ? `
+<div class="small">
+Reason: ${item.reason}
+</div>
+` : ''}
 
 </div>
 
@@ -3223,23 +3248,13 @@ inventoryUpdates.unshift({
   tech: currentTechId,
 
   items: [{
-
-    partNumber:
-      correction.removePart,
-
-    qty:
-      correction.removeQty,
-
-    addedPart:
-      correction.addPart,
-
-    addedQty:
-      correction.addQty,
-
-    reason:
-      correction.reason
-
-  }]
+  job: correction.job,
+  partNumber: correction.removePart,
+  qty: correction.removeQty,
+  addedPart: correction.addPart,
+  addedQty: correction.addQty,
+  reason: correction.reason
+}]
 
 });
 
