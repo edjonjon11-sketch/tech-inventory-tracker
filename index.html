@@ -324,9 +324,9 @@ Email Inventory
 </button>
 
   <button class="btn good"
-onclick="emailManagerSnapshot()">
+onclick="emailWeeklyManagerReport()">
 
-📧 Email Manager Snapshot
+📧 Weekly Manager Report
 
 </button>
   
@@ -2989,7 +2989,7 @@ Qty: ${p.qty}
 
 }
 
-function emailManagerSnapshot(){
+function emailWeeklyManagerReport(){
 
   if(!currentTechId){
 
@@ -3000,13 +3000,15 @@ function emailManagerSnapshot(){
     return;
   }
 
-  let totalQty = 0;
-
   let inventoryText = '';
+  let jobsText = '';
+  let transfersText = '';
+  let replenishmentText = '';
+  let correctionsText = '';
+
+  // INVENTORY
 
   parts.forEach(p=>{
-
-    totalQty += Number(p.qty || 0);
 
     inventoryText +=
 `${p.partNumber}
@@ -3017,33 +3019,135 @@ Qty: ${p.qty}
 
   });
 
-  const lowStock =
-    parts.filter(
-      p =>
-      Number(p.qty) <= Number(p.minQty)
-    );
+  // JOBS
 
-  let lowText = '';
+  jobs.forEach(j=>{
 
-  lowStock.forEach(p=>{
+    jobsText +=
+`
+JOB #${j.jobNumber}
 
-    lowText +=
-`${p.partNumber}
-${p.description}
-Qty: ${p.qty}
+${j.partNumber}
+
+${j.description}
+
+Qty Used:
+${j.qtyUsed}
+
+Date:
+${j.date}
+
+----------------------
 
 `;
 
   });
 
-  const jobsCompleted =
-    new Set(
-      jobs.map(j=>j.jobNumber)
-    ).size;
+  // TRANSFERS
+
+  transfers.forEach(t=>{
+
+    transfersText +=
+`
+FROM:
+${t.from}
+
+TO:
+${t.to}
+
+PART:
+${t.partNumber}
+
+QTY:
+${t.qty}
+
+DATE:
+${t.date}
+
+----------------------
+
+`;
+
+  });
+
+  // REPLENISHMENTS
+
+  inventoryUpdates
+    .filter(
+      u =>
+      u.type === 'Replenishment'
+    )
+    .forEach(u=>{
+
+      replenishmentText +=
+`
+DATE:
+${u.date}
+
+TECH:
+${u.tech}
+
+`;
+
+      u.items.forEach(item=>{
+
+        replenishmentText +=
+`
+${item.partNumber}
+
++${item.qtyAdded}
+
+`;
+
+      });
+
+      replenishmentText +=
+`
+----------------------
+
+`;
+
+    });
+
+  // CORRECTIONS
+
+  const corrections =
+    JSON.parse(
+      localStorage.getItem(
+        'tti_corrections'
+      ) || '[]'
+    );
+
+  corrections.forEach(c=>{
+
+    correctionsText +=
+`
+JOB:
+${c.jobNumber}
+
+REMOVE:
+${c.removePart}
+ x ${c.removeQty}
+
+ADD:
+${c.addPart}
+ x ${c.addQty}
+
+REASON:
+${c.reason}
+
+DATE:
+${c.date}
+
+----------------------
+
+`;
+
+  });
 
   const body =
 
-`TECHNICIAN INVENTORY SNAPSHOT
+`TECHNICIAN WEEKLY REPORT
 
 TECH:
 ${currentTechId}
@@ -3053,31 +3157,37 @@ ${new Date().toLocaleString()}
 
 ================================
 
-TOTAL INVENTORY QTY:
-${totalQty}
-
-TOTAL JOBS:
-${jobsCompleted}
-
-LOW STOCK ITEMS:
-${lowStock.length}
-
-================================
-
-LOW INVENTORY
-
-${lowText || 'No low inventory items'}
-
-================================
-
-CURRENT TRUCK INVENTORY
+CURRENT INVENTORY
 
 ${inventoryText}
 
+================================
+
+JOBS COMPLETED
+
+${jobsText}
+
+================================
+
+TRANSFERS
+
+${transfersText}
+
+================================
+
+CORRECTIONS
+
+${correctionsText}
+
+================================
+
+REPLENISHMENTS
+
+${replenishmentText}
 `;
 
   window.location.href =
-`mailto:?subject=Inventory Snapshot - ${currentTechId}&body=${encodeURIComponent(body)}`;
+`mailto:?subject=Weekly Manager Report - ${currentTechId}&body=${encodeURIComponent(body)}`;
 
 }
   
