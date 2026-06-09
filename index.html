@@ -502,13 +502,13 @@ Apply Replenishment
 <input id="corrJob">
 
 <label>Remove Part</label>
-<input id="corrRemove">
+<select id="corrRemove"></select>
 
 <label>Remove Qty</label>
 <input id="corrRemoveQty" type="number" value="1">
 
 <label>Add Part</label>
-<input id="corrAdd">
+<select id="corrAdd"></select>
 
 <label>Add Qty</label>
 <input id="corrAddQty" type="number" value="1">
@@ -1794,6 +1794,8 @@ function init(){
 
   loadReplenishCategories();
 
+  loadCorrectionParts();
+
   renderReplenishList();
 
   renderAll();
@@ -2174,6 +2176,46 @@ function savePartNote(i,val){
   parts[i].notes = val;
 
   save();
+
+}
+  function loadCorrectionParts(){
+
+  const removeSel =
+    document.getElementById('corrRemove');
+
+  const addSel =
+    document.getElementById('corrAdd');
+
+  if(!removeSel || !addSel) return;
+
+  removeSel.innerHTML='';
+  addSel.innerHTML='';
+
+  parts.forEach(p=>{
+
+    let o1 =
+      document.createElement('option');
+
+    o1.value =
+      p.partNumber;
+
+    o1.textContent =
+      `${p.partNumber} - ${p.description}`;
+
+    removeSel.appendChild(o1);
+
+    let o2 =
+      document.createElement('option');
+
+    o2.value =
+      p.partNumber;
+
+    o2.textContent =
+      `${p.partNumber} - ${p.description}`;
+
+    addSel.appendChild(o2);
+
+  });
 
 }
 function renderPartSelect(){
