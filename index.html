@@ -320,37 +320,105 @@ Inventory Update History
 </section>
   
 <section id="alerts" class="screen">
-  <h2>Low Inventory</h2>
-  <div id="alertList"></div>
-  <button class="btn secondary" onclick="exportData()">Export Backup JSON</button>
-  <button class="btn good"
+
+<h2>Reports & Alerts</h2>
+
+<div class="card">
+
+<div
+onclick="toggleAlerts()"
+style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+cursor:pointer;">
+
+<div>
+
+<h2 style="margin:0;">
+Low Inventory Alerts
+</h2>
+
+<div class="small">
+Tap To Expand
+</div>
+
+</div>
+
+<span id="alertsArrow">
+▼
+</span>
+
+</div>
+
+<div
+id="alertsDropdown"
+style="display:none;margin-top:12px;">
+
+<div id="alertList"></div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Email Reports</h2>
+
+<button
+class="btn good"
 onclick="emailInventoryOnly()">
 
 Email Inventory
 
 </button>
 
-  <button class="btn good"
-onclick="emailWeeklyManagerReport()">
-
-📧 Weekly Manager Report
-
-</button>
-  
-<button class="btn good"
+<button
+class="btn good"
 onclick="emailSelectedJobs()">
 
 Email Selected Jobs
 
 </button>
 
-<button class="btn good"
+<button
+class="btn good"
 onclick="emailWeeklyJobs()">
 
-Email Weekly Jobs
+Weekly Manager Report
 
 </button>
-  <button class="btn danger" onclick="resetApp()">Reset App Data</button>
+
+</div>
+
+<div class="card">
+
+<h2>Data & Backup</h2>
+
+<button
+class="btn secondary"
+onclick="exportData()">
+
+Export Backup JSON
+
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>Danger Zone</h2>
+
+<button
+class="btn danger"
+onclick="resetApp()">
+
+Reset App Data
+
+</button>
+
+</div>
+
 </section>
 
   <section id="summary" class="screen">
@@ -600,7 +668,9 @@ onclick="showScreen('inventory')">
 
 <button id="nav-alerts"
 onclick="showScreen('alerts')">
-🚨 Alerts
+
+📊 Reports
+
 </button>
 
 <button onclick="toggleMoreMenu()">
@@ -1336,6 +1406,33 @@ document.getElementById('lowAlertArrow');
     arrow.textContent='▲';
 
   } else {
+
+    box.style.display='none';
+
+    arrow.textContent='▼';
+
+  }
+
+}
+  function toggleAlerts(){
+
+  const box =
+  document.getElementById(
+    'alertsDropdown'
+  );
+
+  const arrow =
+  document.getElementById(
+    'alertsArrow'
+  );
+
+  if(box.style.display==='none'){
+
+    box.style.display='block';
+
+    arrow.textContent='▲';
+
+  }else{
 
     box.style.display='none';
 
