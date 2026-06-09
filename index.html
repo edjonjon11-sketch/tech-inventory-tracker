@@ -323,6 +323,13 @@ Email Inventory
 
 </button>
 
+  <button class="btn good"
+onclick="emailManagerSnapshot()">
+
+📧 Email Manager Snapshot
+
+</button>
+  
 <button class="btn good"
 onclick="emailSelectedJobs()">
 
@@ -2982,6 +2989,98 @@ Qty: ${p.qty}
 
 }
 
+function emailManagerSnapshot(){
+
+  if(!currentTechId){
+
+    alert(
+      'Please save your Technician ID first.'
+    );
+
+    return;
+  }
+
+  let totalQty = 0;
+
+  let inventoryText = '';
+
+  parts.forEach(p=>{
+
+    totalQty += Number(p.qty || 0);
+
+    inventoryText +=
+`${p.partNumber}
+${p.description}
+Qty: ${p.qty}
+
+`;
+
+  });
+
+  const lowStock =
+    parts.filter(
+      p =>
+      Number(p.qty) <= Number(p.minQty)
+    );
+
+  let lowText = '';
+
+  lowStock.forEach(p=>{
+
+    lowText +=
+`${p.partNumber}
+${p.description}
+Qty: ${p.qty}
+
+`;
+
+  });
+
+  const jobsCompleted =
+    new Set(
+      jobs.map(j=>j.jobNumber)
+    ).size;
+
+  const body =
+
+`TECHNICIAN INVENTORY SNAPSHOT
+
+TECH:
+${currentTechId}
+
+DATE:
+${new Date().toLocaleString()}
+
+================================
+
+TOTAL INVENTORY QTY:
+${totalQty}
+
+TOTAL JOBS:
+${jobsCompleted}
+
+LOW STOCK ITEMS:
+${lowStock.length}
+
+================================
+
+LOW INVENTORY
+
+${lowText || 'No low inventory items'}
+
+================================
+
+CURRENT TRUCK INVENTORY
+
+${inventoryText}
+
+`;
+
+  window.location.href =
+`mailto:?subject=Inventory Snapshot - ${currentTechId}&body=${encodeURIComponent(body)}`;
+
+}
+  
 function emailSelectedJobs(){
   if(!currentTechId){
 
