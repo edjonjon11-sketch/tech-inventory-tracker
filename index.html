@@ -1894,6 +1894,66 @@ function requireTechId(){
     }
   }
 }
+
+function deleteUpdate(i){
+
+  if(!confirm('Delete this inventory update?')){
+    return;
+  }
+
+  inventoryUpdates.splice(i,1);
+
+  save();
+
+  renderAll();
+
+  alert('Inventory update deleted.');
+
+}
+
+function editUpdate(i){
+
+  const update = inventoryUpdates[i];
+
+  if(!update) return;
+
+  const newType = prompt(
+    'Edit update type',
+    update.type || 'Inventory Scan'
+  );
+
+  if(newType === null) return;
+
+  const newDate = prompt(
+    'Edit date',
+    update.date || new Date().toLocaleString()
+  );
+
+  if(newDate === null) return;
+
+  update.type = newType;
+  update.date = newDate;
+
+  if(update.tech !== undefined){
+
+    const newTech = prompt(
+      'Edit tech',
+      update.tech || currentTechId
+    );
+
+    if(newTech !== null){
+      update.tech = newTech.toUpperCase();
+    }
+
+  }
+
+  save();
+
+  renderAll();
+
+  alert('Inventory update edited.');
+
+}
   
 function init(){
 
@@ -2908,6 +2968,18 @@ id="update-${i}"
 style="display:none;margin-top:12px;">
 
 ${itemsHTML}
+
+<button
+class="btn secondary"
+onclick="editUpdate(${i})">
+Edit Update
+</button>
+
+<button
+class="btn danger"
+onclick="deleteUpdate(${i})">
+Delete Update
+</button>
 
 </div>
 `;
