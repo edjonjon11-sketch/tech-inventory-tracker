@@ -840,6 +840,10 @@ localStorage.getItem(
 let selectedCategory = '';
 let replenishItems = [];
 let correctionQueue = [];
+let inventoryShortages =
+JSON.parse(
+  localStorage.getItem('tti_inventory_shortages') || '[]'
+);
   function save(){
 
   localStorage.setItem(
@@ -852,6 +856,11 @@ let correctionQueue = [];
     JSON.stringify(jobs)
   );
 
+localStorage.setItem(
+  'tti_inventory_shortages',
+  JSON.stringify(inventoryShortages)
+);
+    
   localStorage.setItem(
     'tti_transfers',
     JSON.stringify(transfers)
@@ -2521,27 +2530,59 @@ Number(parts[j.index].qty);
 const newQty =
 currentQty - Number(j.qtyUsed);
 
-parts[j.index].qty = newQty;
-
 if(newQty < 0){
 
-  inventoryAdjustments.unshift({
+  const shortageQty = Math.abs(newQty);
 
+  const reason = prompt(
+`Inventory Shortage Detected
+
+Part: ${j.partNumber}
+Shortage Qty: ${shortageQty}
+
+Enter reason:
+Borrowed From Another Tech
+Used Replenishment Stock Before Updating
+Transfer Not Entered Yet
+Inventory Count Incorrect
+Warehouse Shorted Inventory
+Customer Equipment Already On Site
+Emergency Installation
+Wrong Inventory Loaded On Truck
+Lost / Damaged Equipment
+Other`
+  ) || 'Reason Not Entered';
+
+  parts[j.index].qty = 0;
+
+  inventoryShortages.unshift({
     date:new Date().toLocaleString(),
-
-    type:'Missing Inventory',
-
+    type:'Inventory Shortage',
     partNumber:j.partNumber,
-
     description:j.description,
-
-    missingQty:Math.abs(newQty),
-
+    shortageQty:shortageQty,
+    reason:reason,
     jobNumber:jobNumber,
-
-    techName:currentTechId
-
+    techName:currentTechId,
+    status:'Open'
   });
+
+  inventoryUpdates.unshift({
+    date:new Date().toLocaleString(),
+    type:'Inventory Shortage',
+    tech:currentTechId,
+    items:[{
+      job:jobNumber,
+      partNumber:j.partNumber,
+      shortageQty:shortageQty,
+      reason:reason,
+      status:'Open'
+    }]
+  });
+
+}else{
+
+  parts[j.index].qty = newQty;
 
 }
 
