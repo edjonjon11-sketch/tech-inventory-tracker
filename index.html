@@ -3249,7 +3249,26 @@ Qty: ${p.qty}
 `mailto:?subject=Current Inventory&body=${encodeURIComponent(inventoryText)}`;
 
 }
+function getJobsLast7Days(){
 
+  const today = new Date();
+  today.setHours(23,59,59,999);
+
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(today.getDate() - 7);
+  sevenDaysAgo.setHours(0,0,0,0);
+
+  return jobs.filter(j=>{
+
+    const jobDate = new Date(j.date);
+
+    if(isNaN(jobDate)) return false;
+
+    return jobDate >= sevenDaysAgo && jobDate <= today;
+
+  });
+
+}
 function emailWeeklyManagerReport(){
 
   if(!currentTechId){
@@ -3282,7 +3301,9 @@ Qty: ${p.qty}
 
   // JOBS
 
-  jobs.forEach(j=>{
+  const weeklyJobs = getJobsLast7Days();
+
+weeklyJobs.forEach(j=>{
 
     jobsText +=
 `
