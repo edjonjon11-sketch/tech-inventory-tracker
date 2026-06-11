@@ -365,6 +365,12 @@ style="display:none;margin-top:12px;">
 
 <h2>Email Reports</h2>
 
+<label>Report Start Date</label>
+<input type="date" id="reportStart">
+
+<label>Report End Date</label>
+<input type="date" id="reportEnd">
+
 <button
 class="btn good"
 onclick="emailInventoryOnly()">
@@ -3269,6 +3275,33 @@ function getJobsLast7Days(){
   });
 
 }
+
+  function getJobsByDateRange(){
+
+  const start =
+  new Date(
+    document.getElementById('reportStart').value
+  );
+
+  const end =
+  new Date(
+    document.getElementById('reportEnd').value
+  );
+
+  end.setHours(23,59,59,999);
+
+  return jobs.filter(j=>{
+
+    const jobDate = new Date(j.date);
+
+    return (
+      jobDate >= start &&
+      jobDate <= end
+    );
+
+  });
+
+}
 function emailWeeklyManagerReport(){
 
   if(!currentTechId){
@@ -3301,7 +3334,7 @@ Qty: ${p.qty}
 
   // JOBS
 
-  const weeklyJobs = getJobsLast7Days();
+  const weeklyJobs = getJobsByDateRange();
 
 weeklyJobs.forEach(j=>{
 
