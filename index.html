@@ -270,7 +270,12 @@ min-height:100px;
   placeholder="Search part number, description, or job #"
   oninput="renderJobs()"
 >
-
+<button
+class="btn secondary"
+onclick="showAllJobs()">
+Show All Jobs
+</button>
+    
 <div id="recentJobs"></div>
 
 </div>
@@ -2715,6 +2720,28 @@ Other`
   alert('Job completed and inventory deducted.');
 
 }
+let showAllJobsMode = false;
+
+function showAllJobs(){
+
+  showAllJobsMode =
+  !showAllJobsMode;
+
+  const btn =
+  document.querySelector(
+    '[onclick="showAllJobs()"]'
+  );
+
+  btn.textContent =
+  showAllJobsMode
+  ? 'Show Recent Jobs'
+  : 'Show All Jobs';
+
+  renderJobs();
+
+}
+
+}
 function renderJobs(){
 
   const list=document.getElementById('recentJobs');
@@ -2749,7 +2776,9 @@ sortedJobs.forEach(j=>{
 
 });
 
-  Object.keys(grouped).forEach(jobNum=>{
+  Object.keys(grouped)
+.slice(0,10)
+.forEach(jobNum=>{
 
   const items=grouped[jobNum];
 
