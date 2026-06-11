@@ -2775,9 +2775,12 @@ sortedJobs.forEach(j=>{
 
 });
 
-  Object.keys(grouped)
-.slice(0,10)
-.forEach(jobNum=>{
+  const jobsToShow =
+showAllJobsMode
+? Object.keys(grouped)
+: Object.keys(grouped).slice(0,10);
+
+jobsToShow.forEach(jobNum=>{
 
   const items=grouped[jobNum];
 
