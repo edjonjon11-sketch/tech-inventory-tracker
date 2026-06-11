@@ -383,7 +383,7 @@ Email Selected Jobs
 
 <button
 class="btn good"
-onclick="emailWeeklyJobs()">
+onclick="emailWeeklyManagerReport()">
 
 Weekly Manager Report
 
@@ -2982,6 +2982,18 @@ Qty Updated To: ${item.qty}
 </div>
 ` : ''}
 
+${item.shortageQty ? `
+<div class="small">
+Shortage Qty: ${item.shortageQty}
+</div>
+` : ''}
+
+${item.status ? `
+<div class="small">
+Status: ${item.status}
+</div>
+` : ''}
+
 ${item.addedPart ? `
 <div class="small">
 Added Part: ${item.addedPart}
@@ -3697,6 +3709,28 @@ const correction = correctionQueue[
   correctionQueue.length - 1
 ];
 
+let savedCorrections =
+JSON.parse(
+  localStorage.getItem('tti_corrections') || '[]'
+);
+
+savedCorrections.unshift({
+  date:new Date().toLocaleString(),
+  tech:currentTechId,
+  jobNumber:correction.job,
+  removePart:correction.removePart,
+  removeQty:correction.removeQty,
+  addPart:correction.addPart,
+  addQty:correction.addQty,
+  reason:correction.reason,
+  notes:correction.notes
+});
+
+localStorage.setItem(
+  'tti_corrections',
+  JSON.stringify(savedCorrections)
+);
+    
 inventoryUpdates.unshift({
 
   date: new Date().toLocaleString(),
