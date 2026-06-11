@@ -387,6 +387,74 @@ Email Selected Jobs
 
 </button>
 
+  <div
+onclick="toggleReportDates()"
+style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+cursor:pointer;">
+
+<div>
+
+<h2 style="margin:0;">
+Report Date Range
+</h2>
+
+<div class="small">
+Tap To Expand
+</div>
+
+</div>
+
+<span id="reportArrow">
+▼
+</span>
+
+</div>
+
+<div
+id="reportDateDropdown"
+style="display:none;margin-top:12px;">
+
+<label>Report Start Date</label>
+<input type="date" id="reportStart">
+
+<label>Report End Date</label>
+<input type="date" id="reportEnd">
+
+<div
+id="reportDateDropdown"
+style="display:none;margin-top:12px;">
+
+<label>Report Start Date</label>
+<input type="date" id="reportStart">
+
+<label>Report End Date</label>
+<input type="date" id="reportEnd">
+
+<button
+class="btn secondary"
+onclick="setThisWeek()">
+This Week
+</button>
+
+<button
+class="btn secondary"
+onclick="setLastWeek()">
+Last Week
+</button>
+
+<button
+class="btn secondary"
+onclick="setThisMonth()">
+This Month
+</button>
+
+</div>
+
+</div>
+  
 <button
 class="btn good"
 onclick="emailWeeklyManagerReport()">
@@ -1274,6 +1342,34 @@ function toggleSummary(id,arrowId){
     arrow.textContent='▲';
 
   } else {
+
+    box.style.display='none';
+
+    arrow.textContent='▼';
+
+  }
+
+}
+
+  function toggleReportDates(){
+
+  const box =
+  document.getElementById(
+    'reportDateDropdown'
+  );
+
+  const arrow =
+  document.getElementById(
+    'reportArrow'
+  );
+
+  if(box.style.display==='none'){
+
+    box.style.display='block';
+
+    arrow.textContent='▲';
+
+  }else{
 
     box.style.display='none';
 
