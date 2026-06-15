@@ -422,15 +422,7 @@ Tap To Expand
 id="reportDateDropdown"
 style="display:none;margin-top:12px;">
 
-<label>Report Start Date</label>
-<input type="date" id="reportStart">
-
-<label>Report End Date</label>
-<input type="date" id="reportEnd">
-
 <div
-id="reportDateDropdown"
-style="display:none;margin-top:12px;">
 
 <button
 class="btn secondary"
@@ -2962,15 +2954,78 @@ font-weight:bold;
 
 }
   function setThisWeek(){
-  // Auto-fill current week dates
+
+  const today = new Date();
+
+  const first =
+    new Date(today);
+
+  first.setDate(
+    today.getDate() - today.getDay()
+  );
+
+  const last =
+    new Date(first);
+
+  last.setDate(
+    first.getDate() + 6
+  );
+
+  document.getElementById('reportStart').value =
+    first.toISOString().split('T')[0];
+
+  document.getElementById('reportEnd').value =
+    last.toISOString().split('T')[0];
 }
 
 function setLastWeek(){
-  // Auto-fill previous week dates
+
+  const today = new Date();
+
+  const first =
+    new Date(today);
+
+  first.setDate(
+    today.getDate() - today.getDay() - 7
+  );
+
+  const last =
+    new Date(first);
+
+  last.setDate(
+    first.getDate() + 6
+  );
+
+  document.getElementById('reportStart').value =
+    first.toISOString().split('T')[0];
+
+  document.getElementById('reportEnd').value =
+    last.toISOString().split('T')[0];
 }
 
 function setThisMonth(){
-  // Auto-fill current month dates
+
+  const today = new Date();
+
+  const first =
+    new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      1
+    );
+
+  const last =
+    new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      0
+    );
+
+  document.getElementById('reportStart').value =
+    first.toISOString().split('T')[0];
+
+  document.getElementById('reportEnd').value =
+    last.toISOString().split('T')[0];
 }
   function deleteJob(jobNumber){
 
