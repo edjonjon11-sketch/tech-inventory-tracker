@@ -432,12 +432,6 @@ style="display:none;margin-top:12px;">
 id="reportDateDropdown"
 style="display:none;margin-top:12px;">
 
-<label>Report Start Date</label>
-<input type="date" id="reportStart">
-
-<label>Report End Date</label>
-<input type="date" id="reportEnd">
-
 <button
 class="btn secondary"
 onclick="setThisWeek()">
@@ -3416,21 +3410,33 @@ function getJobsLast7Days(){
 
   function getJobsByDateRange(){
 
+  const startValue =
+    document.getElementById('reportStart').value;
+
+  const endValue =
+    document.getElementById('reportEnd').value;
+
+  if(!startValue || !endValue){
+
+    alert('Please select a start and end date.');
+
+    return [];
+  }
+
   const start =
-  new Date(
-    document.getElementById('reportStart').value
-  );
+    new Date(startValue + 'T00:00:00');
 
   const end =
-  new Date(
-    document.getElementById('reportEnd').value
-  );
-
-  end.setHours(23,59,59,999);
+    new Date(endValue + 'T23:59:59');
 
   return jobs.filter(j=>{
 
-    const jobDate = new Date(j.date);
+    const jobDate =
+      new Date(j.date);
+
+    if(isNaN(jobDate)){
+      return false;
+    }
 
     return (
       jobDate >= start &&
