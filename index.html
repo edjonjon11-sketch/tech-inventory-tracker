@@ -3712,45 +3712,36 @@ ${replenishmentText}
 }
   
 function emailSelectedJobs(){
+
   if(!currentTechId){
-
-  alert(
-    'Please save your Technician ID first.'
-  );
-
-  return;
-
-}
-
-  if(selectedJobs.length === 0){
-
-    alert('Select at least one job.');
-
+    alert('Please save your Technician ID first.');
     return;
-
   }
 
-  let body = `WEEKLY JOBS AND PARTS
+  if(selectedJobs.length === 0){
+    alert('Select at least one job.');
+    return;
+  }
 
-Technician: ${currentTechId || 'N/A'}
+  let body = `
+WEEKLY JOBS AND PARTS
 
-================================================
+Technician: ${currentTechId}
+
+========================================
 
 `;
 
   selectedJobs.forEach(jobNum=>{
 
-    const jobItems = jobs.filter(
-      j => j.jobNumber === jobNum
-    );
+    const jobItems =
+      jobs.filter(j => j.jobNumber === jobNum);
 
     if(jobItems.length === 0) return;
 
     const first = jobItems[0];
 
     body += `
-================================================
-
 JOB #${jobNum}
 
 Customer:
@@ -3759,13 +3750,11 @@ ${first.customer || 'N/A'}
 Job Type:
 ${first.jobType || 'N/A'}
 
-Technician:
-${first.techName || ''}
-
 Date:
 ${first.date}
 
 PARTS USED
+----------------------------------------
 
 `;
 
@@ -3773,11 +3762,8 @@ PARTS USED
 
       body += `
 ${j.partNumber}
-
 ${j.description}
-
-Qty Used:
-${j.qtyUsed}
+Qty Used: ${j.qtyUsed}
 
 `;
 
@@ -3785,15 +3771,16 @@ ${j.qtyUsed}
 
     body += `
 Notes:
-
 ${first.notes || 'None'}
+
+========================================
 
 `;
 
   });
 
   window.location.href =
-`mailto:?subject=Weekly Jobs and Parts&body=${encodeURIComponent(body)}`;
+  `mailto:?subject=Weekly Jobs and Parts&body=${encodeURIComponent(body)}`;
 
 }
 
