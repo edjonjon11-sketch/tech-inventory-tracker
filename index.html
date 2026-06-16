@@ -405,78 +405,34 @@ Email Selected Jobs
 
 <div
 onclick="toggleReportDates()"
-style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-cursor:pointer;">
+style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;">
 
 <div>
-
-<h2 style="margin:0;">
-Weekly Manager Report Date Range
-</h2>
-
-<div class="small">
-Tap To Expand
+<h2 style="margin:0;">Weekly Manager Report Date Range</h2>
+<div class="small">Tap To Expand</div>
 </div>
+
+<span id="reportArrow">▼</span>
 
 </div>
 
-<span id="reportArrow">
-▼
-</span>
-
-</div>
-
-<div
-id="reportDateDropdown"
-style="display:none;margin-top:12px;">
+<div id="reportDateDropdown" style="display:none;margin-top:12px;">
 
 <label>Report Start Date</label>
-
-<input
-type="date"
-id="reportStart">
+<input type="date" id="managerReportStart">
 
 <label>Report End Date</label>
+<input type="date" id="managerReportEnd">
 
-<input
-type="date"
-id="reportEnd">
-
-<button
-class="btn secondary"
-onclick="setThisWeek()">
-This Week
-</button>
-
-<button
-class="btn secondary"
-onclick="setLastWeek()">
-Last Week
-</button>
-
-<button
-class="btn secondary"
-onclick="setThisMonth()">
-This Month
-</button>
-
-<button
-class="btn secondary"
-onclick="setAllDates()">
-All Jobs
-</button>
+<button class="btn secondary" onclick="setThisWeek()">This Week</button>
+<button class="btn secondary" onclick="setLastWeek()">Last Week</button>
+<button class="btn secondary" onclick="setThisMonth()">This Month</button>
+<button class="btn secondary" onclick="setAllDates()">All Jobs</button>
 
 </div>
 
-<button
-class="btn good"
-onclick="emailWeeklyManagerReport()">
-
+<button class="btn good" onclick="emailWeeklyManagerReport()">
 Weekly Manager Report
-
 </button>
 
 </div>
@@ -3495,71 +3451,41 @@ function getJobsLast7Days(){
 }
 
   function setAllDates(){
-
-  document.getElementById('reportStart').value =
-    '2020-01-01';
-
-  document.getElementById('reportEnd').value =
-    '2099-12-31';
-
+  document.getElementById('managerReportStart').value = '2020-01-01';
+  document.getElementById('managerReportEnd').value = '2099-12-31';
 }
-  
-  function getJobsByDateRange(){
+
+function getJobsByDateRange(){
 
   const startValue =
-    document.getElementById('reportStart').value;
+    document.getElementById('managerReportStart').value;
 
   const endValue =
-    document.getElementById('reportEnd').value;
+    document.getElementById('managerReportEnd').value;
 
-  // If no dates selected, return ALL jobs
   if(!startValue || !endValue){
-    return jobs;
+    alert('Please select report start and end date.');
+    return [];
   }
 
-  const start = new Date(startValue);
-  start.setHours(0,0,0,0);
-
-  const end = new Date(endValue);
-  end.setHours(23,59,59,999);
+  const start = new Date(startValue + 'T00:00:00');
+  const end = new Date(endValue + 'T23:59:59');
 
   return jobs.filter(j=>{
 
     if(!j.date) return false;
 
-    let jobDate;
+    let jobDate = new Date(j.date);
 
-    // Handles dates like:
-    // 6/15/2026, 9:30:15 AM
-    // 6/15/2026
-    // ISO dates
-
-    if(j.date.includes(',')){
-
-      const datePart =
-        j.date.split(',')[0];
-
-      jobDate =
-        new Date(datePart);
-
-    }else{
-
-      jobDate =
-        new Date(j.date);
-
+    if(isNaN(jobDate) && j.date.includes(',')){
+      jobDate = new Date(j.date.split(',')[0]);
     }
 
-    if(isNaN(jobDate)){
-      return true; // show job anyway if date can't be parsed
-    }
+    if(isNaN(jobDate)) return false;
 
-    return (
-      jobDate >= start &&
-      jobDate <= end
-    );
+    return jobDate >= start && jobDate <= end;
 
   });
-
 }
 function emailWeeklyManagerReport(){
 
@@ -3592,11 +3518,11 @@ Qty: ${p.qty}
   });
 
   // JOBS
-  // Use ALL saved jobs
+const weeklyJobs = getJobsByDateRange();
 
-  const groupedJobs = {};
+const groupedJobs = {};
 
-  jobs.forEach(j=>{
+weeklyJobs.forEach(j=>{
 
     if(!groupedJobs[j.jobNumber]){
       groupedJobs[j.jobNumber] = [];
