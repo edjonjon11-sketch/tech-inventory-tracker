@@ -3484,28 +3484,40 @@ function getJobsLast7Days(){
     document.getElementById('reportEnd').value;
 
   if(!startValue || !endValue){
-
-    alert('Please select a start and end date.');
-
-    return [];
+    return jobs;
   }
 
   const start =
-    new Date(startValue + 'T00:00:00');
+    new Date(startValue);
+
+  start.setHours(0,0,0,0);
 
   const end =
-    new Date(endValue + 'T23:59:59');
+    new Date(endValue);
+
+  end.setHours(23,59,59,999);
 
   return jobs.filter(j=>{
 
-    const jobDate =
+    let jobDate =
       new Date(j.date);
 
     if(isNaN(jobDate)){
-      return false;
+
+      const parts =
+        j.date.split(',');
+
+      if(parts.length){
+
+        jobDate =
+          new Date(parts[0]);
+
+      }
+
     }
 
     return (
+      !isNaN(jobDate) &&
       jobDate >= start &&
       jobDate <= end
     );
