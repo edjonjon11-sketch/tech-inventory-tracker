@@ -3512,40 +3512,24 @@ Qty: ${p.qty}
 
   });
 
-  // SELECTED JOBS ONLY
+  // JOBS (SELECTED ONLY)
 
-const groupedJobs = {};
+if(selectedJobs.length === 0){
 
-selectedJobs.forEach(jobNum=>{
+  jobsText = 'NO JOBS SELECTED\n\n';
 
-  const jobItems =
-    jobs.filter(j=>j.jobNumber === jobNum);
+} else {
 
-  if(jobItems.length){
+  selectedJobs.forEach(jobNum=>{
 
-    groupedJobs[jobNum] = jobItems;
+    const items =
+      jobs.filter(j => j.jobNumber === jobNum);
 
-  }
+    if(items.length === 0) return;
 
-});
+    const first = items[0];
 
-if(Object.keys(groupedJobs).length === 0){
-
-  alert(
-    'Please select at least one job.'
-  );
-
-  return;
-
-}
-
-Object.keys(groupedJobs).forEach(jobNum=>{
-
-  const items = groupedJobs[jobNum];
-
-  const first = items[0];
-
-  jobsText +=
+    jobsText +=
 `
 JOB #${jobNum}
 
@@ -3569,9 +3553,9 @@ PARTS USED
 
 `;
 
-  items.forEach(j=>{
+    items.forEach(j=>{
 
-    jobsText +=
+      jobsText +=
 `
 ${j.partNumber}
 
@@ -3582,15 +3566,17 @@ ${j.qtyUsed}
 
 `;
 
-  });
+    });
 
-  jobsText +=
+    jobsText +=
 `
 ==================================
 
 `;
 
-});
+  });
+
+}
 
   // TRANSFERS
 
