@@ -2573,9 +2573,6 @@ function finishJob(){
 
   const jobNotes =
   document.getElementById('jobNotes').value.trim();
-  document.getElementById('jobNumber').value='';
-document.getElementById('customer').value='';
-document.getElementById('qtyUsed').value='1';
   
   if(!jobNumber){
     alert('Enter a job number first.');
@@ -2670,6 +2667,9 @@ Other`
   document.getElementById('currentJobParts').innerHTML='';
 
   document.getElementById('jobNotes').value='';
+  document.getElementById('jobNumber').value='';
+document.getElementById('customer').value='';
+document.getElementById('qtyUsed').value='1';
 
   alert('Job completed and inventory deducted.');
 
