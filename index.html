@@ -400,7 +400,7 @@ Email Selected Jobs
 
 </button>
 
-  <div
+
 <div class="card">
 
 <div
@@ -2664,7 +2664,12 @@ Other`
 
   renderAll();
 
-  document.getElementById('currentJobParts').innerHTML='';
+  const box =
+document.getElementById('currentJobParts');
+
+if(box){
+  box.innerHTML='';
+}
 
   document.getElementById('jobNotes').value='';
   document.getElementById('jobNumber').value='';
