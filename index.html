@@ -401,6 +401,9 @@ Email Selected Jobs
 </button>
 
   <div
+<div class="card">
+
+<div
 onclick="toggleReportDates()"
 style="
 display:flex;
@@ -411,7 +414,7 @@ cursor:pointer;">
 <div>
 
 <h2 style="margin:0;">
-Report Date Range
+Weekly Manager Report Date Range
 </h2>
 
 <div class="small">
@@ -429,6 +432,18 @@ Tap To Expand
 <div
 id="reportDateDropdown"
 style="display:none;margin-top:12px;">
+
+<label>Report Start Date</label>
+
+<input
+type="date"
+id="reportStart">
+
+<label>Report End Date</label>
+
+<input
+type="date"
+id="reportEnd">
 
 <button
 class="btn secondary"
@@ -448,10 +463,14 @@ onclick="setThisMonth()">
 This Month
 </button>
 
-</div>
+<button
+class="btn secondary"
+onclick="setAllDates()">
+All Jobs
+</button>
 
 </div>
-  
+
 <button
 class="btn good"
 onclick="emailWeeklyManagerReport()">
@@ -3475,6 +3494,16 @@ function getJobsLast7Days(){
 
 }
 
+  function setAllDates(){
+
+  document.getElementById('reportStart').value =
+    '2020-01-01';
+
+  document.getElementById('reportEnd').value =
+    '2099-12-31';
+
+}
+  
   function getJobsByDateRange(){
 
   const startValue =
