@@ -371,10 +371,18 @@ style="display:none;margin-top:12px;">
 <h2>Email Reports</h2>
 
 <label>Report Start Date</label>
-<input type="date" id="reportStart">
+<input
+type="date"
+id="reportStart"
+onclick="this.showPicker && this.showPicker()"
+onfocus="this.showPicker && this.showPicker()">
 
 <label>Report End Date</label>
-<input type="date" id="reportEnd">
+<input
+type="date"
+id="reportEnd"
+onclick="this.showPicker && this.showPicker()"
+onfocus="this.showPicker && this.showPicker()">
 
 <button
 class="btn good"
