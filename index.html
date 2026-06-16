@@ -3139,9 +3139,21 @@ Job: ${item.job}
 </div>
 ` : ''}
 
-${item.qty ? `
+${item.oldQty !== undefined ? `
 <div class="small">
-Qty Updated To: ${item.qty}
+Previous Qty: ${item.oldQty}
+</div>
+` : ''}
+
+${item.qtyAdded !== undefined ? `
+<div class="small">
+Added Qty: ${item.qtyAdded}
+</div>
+` : ''}
+
+${item.qty !== undefined ? `
+<div class="small">
+New Qty: ${item.qty}
 </div>
 ` : ''}
 
