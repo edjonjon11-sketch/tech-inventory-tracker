@@ -2103,6 +2103,12 @@ function init(){
     'techIdInput'
   ).value = currentTechId;
 
+  document.getElementById('reportStart').value =
+  new Date().toISOString().split('T')[0];
+
+  document.getElementById('reportEnd').value =
+  new Date().toISOString().split('T')[0];
+
   loadReplenishCategories();
 
   loadCorrectionParts();
@@ -3539,14 +3545,45 @@ Qty: ${p.qty}
 
   // JOBS
 
-  const weeklyJobs = getJobsByDateRange();
+const weeklyJobs = getJobsByDateRange();
 
-weeklyJobs.forEach(j=>{
+const groupedJobs = {};
 
-    jobsText +=
-`
-JOB #${j.jobNumber}
+weeklyJobs.forEach(j => {
 
+  if(!groupedJobs[j.jobNumber]){
+    groupedJobs[j.jobNumber] = [];
+  }
+
+  groupedJobs[j.jobNumber].push(j);
+
+});
+
+Object.keys(groupedJobs).forEach(jobNum => {
+
+  const items = groupedJobs[jobNum];
+  const first = items[0];
+
+  jobsText += `
+JOB #${jobNum}
+
+Customer:
+${first.customer || 'N/A'}
+
+Job Type:
+${first.jobType || 'N/A'}
+
+Date:
+${first.date}
+
+PARTS USED
+----------------------
+
+`;
+
+  items.forEach(j => {
+
+    jobsText += `
 ${j.partNumber}
 
 ${j.description}
@@ -3554,14 +3591,16 @@ ${j.description}
 Qty Used:
 ${j.qtyUsed}
 
-Date:
-${j.date}
-
-----------------------
-
 `;
 
   });
+
+  jobsText += `
+================================
+
+`;
+
+});
 
   // TRANSFERS
 
