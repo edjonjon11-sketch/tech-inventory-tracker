@@ -3483,41 +3483,48 @@ function getJobsLast7Days(){
   const endValue =
     document.getElementById('reportEnd').value;
 
+  // If no dates selected, return ALL jobs
   if(!startValue || !endValue){
     return jobs;
   }
 
-  const start =
-    new Date(startValue);
-
+  const start = new Date(startValue);
   start.setHours(0,0,0,0);
 
-  const end =
-    new Date(endValue);
-
+  const end = new Date(endValue);
   end.setHours(23,59,59,999);
 
   return jobs.filter(j=>{
 
-    let jobDate =
-      new Date(j.date);
+    if(!j.date) return false;
 
-    if(isNaN(jobDate)){
+    let jobDate;
 
-      const parts =
-        j.date.split(',');
+    // Handles dates like:
+    // 6/15/2026, 9:30:15 AM
+    // 6/15/2026
+    // ISO dates
 
-      if(parts.length){
+    if(j.date.includes(',')){
 
-        jobDate =
-          new Date(parts[0]);
+      const datePart =
+        j.date.split(',')[0];
 
-      }
+      jobDate =
+        new Date(datePart);
+
+    }else{
+
+      jobDate =
+        new Date(j.date);
 
     }
 
+    if(isNaN(jobDate)){
+      return true; // show job anyway if date can't be parsed
+    }
+
     return (
-      !isNaN(jobDate) &&
       jobDate >= start &&
       jobDate <= end
     );
@@ -3556,27 +3563,34 @@ Qty: ${p.qty}
   });
 
   // JOBS
+  // Use ALL saved jobs
 
-const weeklyJobs = getJobsByDateRange();
+  const groupedJobs = {};
 
-const groupedJobs = {};
+  jobs.forEach(j=>{
 
-weeklyJobs.forEach(j => {
+    if(!groupedJobs[j.jobNumber]){
+      groupedJobs[j.jobNumber] = [];
+    }
 
-  if(!groupedJobs[j.jobNumber]){
-    groupedJobs[j.jobNumber] = [];
-  }
+    groupedJobs[j.jobNumber].push(j);
 
-  groupedJobs[j.jobNumber].push(j);
+  });
 
-});
+  if(Object.keys(groupedJobs).length === 0){
 
-Object.keys(groupedJobs).forEach(jobNum => {
+    jobsText =
+      'NO JOBS FOUND\n\n';
 
-  const items = groupedJobs[jobNum];
-  const first = items[0];
+  } else {
 
-  jobsText += `
+    Object.keys(groupedJobs).forEach(jobNum=>{
+
+      const items = groupedJobs[jobNum];
+      const first = items[0];
+
+      jobsText +=
+`
 JOB #${jobNum}
 
 Customer:
@@ -3586,16 +3600,23 @@ Job Type:
 ${first.jobType || 'N/A'}
 
 Date:
-${first.date}
+${first.date || 'N/A'}
+
+Technician:
+${first.techName || currentTechId}
+
+Notes:
+${first.notes || 'None'}
 
 PARTS USED
-----------------------
+----------------------------------
 
 `;
 
-  items.forEach(j => {
+      items.forEach(j=>{
 
-    jobsText += `
+        jobsText +=
+`
 ${j.partNumber}
 
 ${j.description}
@@ -3605,14 +3626,17 @@ ${j.qtyUsed}
 
 `;
 
-  });
+      });
 
-  jobsText += `
-================================
+      jobsText +=
+`
+==================================
 
 `;
 
-});
+    });
+
+  }
 
   // TRANSFERS
 
@@ -3635,7 +3659,7 @@ ${t.qty}
 DATE:
 ${t.date}
 
-----------------------
+----------------------------------
 
 `;
 
@@ -3644,10 +3668,7 @@ ${t.date}
   // REPLENISHMENTS
 
   inventoryUpdates
-    .filter(
-      u =>
-      u.type === 'Replenishment'
-    )
+    .filter(u => u.type === 'Replenishment')
     .forEach(u=>{
 
       replenishmentText +=
@@ -3674,7 +3695,7 @@ ${item.partNumber}
 
       replenishmentText +=
 `
-----------------------
+----------------------------------
 
 `;
 
@@ -3710,51 +3731,51 @@ ${c.reason}
 DATE:
 ${c.date}
 
-----------------------
+----------------------------------
 
 `;
 
   });
 
   const body =
-
 `TECHNICIAN WEEKLY REPORT
 
 TECH:
 ${currentTechId}
 
-DATE:
+REPORT DATE:
 ${new Date().toLocaleString()}
 
-================================
+==================================================
 
 CURRENT INVENTORY
 
 ${inventoryText}
 
-================================
+==================================================
 
 JOBS COMPLETED
 
 ${jobsText}
 
-================================
+==================================================
 
 TRANSFERS
 
-${transfersText}
+${transfersText || 'NONE'}
 
-================================
+==================================================
 
 CORRECTIONS
 
-${correctionsText}
+${correctionsText || 'NONE'}
 
-================================
+==================================================
 
 REPLENISHMENTS
 
-${replenishmentText}
+${replenishmentText || 'NONE'}
+
 `;
 
   window.location.href =
