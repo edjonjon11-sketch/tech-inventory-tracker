@@ -853,6 +853,25 @@ let selectedJobs = JSON.parse(
   localStorage.getItem('tti_selectedJobs') || '[]'
 );
 let jobs = JSON.parse(localStorage.getItem('tti_jobs') || '[]');
+jobs.forEach(job=>{
+
+  if(!job.timestamp){
+
+    const parsed =
+      new Date(job.date).getTime();
+
+    job.timestamp =
+      isNaN(parsed)
+      ? Date.now()
+      : parsed;
+
+  }
+
+});
+localStorage.setItem(
+  'tti_jobs',
+  JSON.stringify(jobs)
+);
 let transfers = JSON.parse(localStorage.getItem('tti_transfers') || '[]');
 let actualInventory = [];
 let inventoryUpdates =
@@ -2628,8 +2647,9 @@ Other`
 }
 
     jobs.unshift({
-      date:new Date().toLocaleString(),
-      jobNumber,
+  date:new Date().toLocaleString(),
+  timestamp: Date.now(),
+  jobNumber,
       customer:document.getElementById('customer').value.trim(),
       jobType:document.getElementById('jobType').value,
       techName: currentTechId,
@@ -2689,13 +2709,10 @@ function renderJobs(){
 
   const sortedJobs = [...jobs].sort((a,b)=>{
 
-  const dateA = Date.parse(a.date);
-  const dateB = Date.parse(b.date);
-
-  if(isNaN(dateA)) return 1;
-  if(isNaN(dateB)) return -1;
-
-  return dateB - dateA;
+  return (
+    (b.timestamp || 0) -
+    (a.timestamp || 0)
+  );
 
 });
 
@@ -3266,8 +3283,17 @@ function editJobDate(jobNum){
   if(!newDate) return;
 
   jobItems.forEach(j=>{
-    j.date = newDate;
-  });
+
+  j.date = newDate;
+
+  const editedTime =
+    new Date(newDate).getTime();
+
+  if(!isNaN(editedTime)){
+    j.timestamp = editedTime;
+  }
+
+});
 
   save();
 
