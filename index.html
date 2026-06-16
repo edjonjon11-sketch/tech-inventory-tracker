@@ -273,7 +273,7 @@ min-height:100px;
 <button
 class="btn secondary"
 onclick="showAllJobs()">
-Show All Jobs
+Show More Jobs
 </button>
     
 <div id="recentJobs"></div>
@@ -2692,9 +2692,9 @@ function showAllJobs(){
   );
 
   btn.textContent =
-  showAllJobsMode
-  ? 'Show Recent Jobs'
-  : 'Show All Jobs';
+showAllJobsMode
+? 'Show Less Jobs'
+: 'Show More Jobs';
 
   renderJobs();
 
