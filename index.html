@@ -408,21 +408,12 @@ onclick="toggleReportDates()"
 style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;">
 
 <div>
-<h2 style="margin:0;">Weekly Manager Report Date Range</h2>
-<div class="small">Tap To Expand</div>
+<h2 style="margin:0;">
+Manager Report
+</h2>
+<div class="small">
+Includes Selected Jobs, Inventory, Transfers & Replenishments
 </div>
-
-<span id="reportArrow">▼</span>
-
-</div>
-
-<div id="reportDateDropdown" style="display:none;margin-top:12px;">
-
-<label>Report Start Date</label>
-<input type="date" id="managerReportStart">
-
-<label>Report End Date</label>
-<input type="date" id="managerReportEnd">
 
 </div>
 
@@ -1309,34 +1300,6 @@ function toggleSummary(id,arrowId){
     arrow.textContent='▲';
 
   } else {
-
-    box.style.display='none';
-
-    arrow.textContent='▼';
-
-  }
-
-}
-
-  function toggleReportDates(){
-
-  const box =
-  document.getElementById(
-    'reportDateDropdown'
-  );
-
-  const arrow =
-  document.getElementById(
-    'reportArrow'
-  );
-
-  if(box.style.display==='none'){
-
-    box.style.display='block';
-
-    arrow.textContent='▲';
-
-  }else{
 
     box.style.display='none';
 
