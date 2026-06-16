@@ -3517,34 +3517,40 @@ Qty: ${p.qty}
 
   });
 
-  // JOBS
-const weeklyJobs = getJobsByDateRange();
+  // SELECTED JOBS ONLY
 
 const groupedJobs = {};
 
-weeklyJobs.forEach(j=>{
+selectedJobs.forEach(jobNum=>{
 
-    if(!groupedJobs[j.jobNumber]){
-      groupedJobs[j.jobNumber] = [];
-    }
+  const jobItems =
+    jobs.filter(j=>j.jobNumber === jobNum);
 
-    groupedJobs[j.jobNumber].push(j);
+  if(jobItems.length){
 
-  });
+    groupedJobs[jobNum] = jobItems;
 
-  if(Object.keys(groupedJobs).length === 0){
+  }
 
-    jobsText =
-      'NO JOBS FOUND\n\n';
+});
 
-  } else {
+if(Object.keys(groupedJobs).length === 0){
 
-    Object.keys(groupedJobs).forEach(jobNum=>{
+  alert(
+    'Please select at least one job.'
+  );
 
-      const items = groupedJobs[jobNum];
-      const first = items[0];
+  return;
 
-      jobsText +=
+}
+
+Object.keys(groupedJobs).forEach(jobNum=>{
+
+  const items = groupedJobs[jobNum];
+
+  const first = items[0];
+
+  jobsText +=
 `
 JOB #${jobNum}
 
@@ -3568,9 +3574,9 @@ PARTS USED
 
 `;
 
-      items.forEach(j=>{
+  items.forEach(j=>{
 
-        jobsText +=
+    jobsText +=
 `
 ${j.partNumber}
 
@@ -3581,17 +3587,15 @@ ${j.qtyUsed}
 
 `;
 
-      });
+  });
 
-      jobsText +=
+  jobsText +=
 `
 ==================================
 
 `;
 
-    });
-
-  }
+});
 
   // TRANSFERS
 
