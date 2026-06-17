@@ -1986,7 +1986,66 @@ function requireTechId(){
     }
   }
 }
+function editReplenishment(i){
 
+  const update = inventoryUpdates[i];
+
+  if(!update || !update.items) return;
+
+  update.items.forEach(item=>{
+
+    if(item.qtyAdded === undefined) return;
+
+    const newQty = prompt(
+      `Edit Added Qty for ${item.partNumber}`,
+      item.qtyAdded
+    );
+
+    if(newQty === null) return;
+
+    const qtyNum = Number(newQty);
+
+    if(isNaN(qtyNum) || qtyNum < 0){
+      alert('Invalid quantity');
+      return;
+    }
+
+    const difference =
+      qtyNum - Number(item.qtyAdded);
+
+    const part = parts.find(
+      p => p.partNumber === item.partNumber
+    );
+
+    if(part){
+
+      part.qty =
+        Number(part.qty) + difference;
+
+      if(part.qty < 0){
+        part.qty = 0;
+      }
+
+    }
+
+    item.qtyAdded = qtyNum;
+
+    if(item.oldQty !== undefined){
+
+      item.qty =
+        Number(item.oldQty) + qtyNum;
+
+    }
+
+  });
+
+  save();
+
+  renderAll();
+
+  alert('Replenishment updated.');
+
+}
 function deleteUpdate(i){
 
   if(!confirm('Delete this inventory update?')){
@@ -2948,55 +3007,6 @@ font-weight:bold;
     last.toISOString().split('T')[0];
 }
 
-function setLastWeek(){
-
-  const today = new Date();
-
-  const first =
-    new Date(today);
-
-  first.setDate(
-    today.getDate() - today.getDay() - 7
-  );
-
-  const last =
-    new Date(first);
-
-  last.setDate(
-    first.getDate() + 6
-  );
-
-  document.getElementById('reportStart').value =
-    first.toISOString().split('T')[0];
-
-  document.getElementById('reportEnd').value =
-    last.toISOString().split('T')[0];
-}
-
-function setThisMonth(){
-
-  const today = new Date();
-
-  const first =
-    new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      1
-    );
-
-  const last =
-    new Date(
-      today.getFullYear(),
-      today.getMonth() + 1,
-      0
-    );
-
-  document.getElementById('reportStart').value =
-    first.toISOString().split('T')[0];
-
-  document.getElementById('reportEnd').value =
-    last.toISOString().split('T')[0];
-}
   function deleteJob(jobNumber){
 
   if(!confirm(`Delete Job #${jobNumber}?`)){
@@ -3233,6 +3243,12 @@ ${itemsHTML}
 class="btn secondary"
 onclick="editUpdate(${i})">
 Edit Update
+</button>
+
+<button
+class="btn good"
+onclick="editReplenishment(${i})">
+Edit Replenishment
 </button>
 
 <button
