@@ -163,6 +163,14 @@ onclick="clearRecon()">
 
 Clear Reconciliation
 
+  <button
+class="btn secondary"
+onclick="manualRecon()">
+
+Manual Company Inventory Entry
+
+</button>
+  
 </button>
   
 <div id="reconResults"></div>
@@ -1687,26 +1695,46 @@ if(qtyMatch){
   function compareInventory(){
 
 const box =
-document.getElementById(
-'reconResults'
-);
+document.getElementById('reconResults');
 
 box.innerHTML='';
 
-parts.forEach(p=>{
+actualInventory.forEach(scan=>{
 
-const found =
-actualInventory.find(
-a=>a.partNumber===p.partNumber
+const truckPart =
+parts.find(
+p => p.partNumber === scan.partNumber
 );
 
-const actualQty =
-found ? found.qty : 0;
+if(!truckPart) return;
+
+const truckQty =
+Number(truckPart.qty);
+
+const companyQty =
+Number(scan.qty);
 
 const diff =
-actualQty - Number(p.qty);
+truckQty - companyQty;
 
-if(diff !== 0){
+let status = '';
+
+if(diff > 0){
+
+status =
+`Truck Has ${diff} More Than Company`;
+
+}else if(diff < 0){
+
+status =
+`Truck Has ${Math.abs(diff)} Less Than Company`;
+
+}else{
+
+status =
+'Inventory Matches';
+
+}
 
 let d =
 document.createElement('div');
@@ -1717,35 +1745,37 @@ d.innerHTML=
 `
 <div>
 
-<b>${p.partNumber}</b>
+<b>${truckPart.partNumber}</b>
 
 <div class="small">
-Expected: ${p.qty}
+Truck Inventory: ${truckQty}
 </div>
 
 <div class="small">
-Actual: ${actualQty}
+Company Inventory: ${companyQty}
+</div>
+
+<div class="small">
+${status}
 </div>
 
 </div>
 
-<span class="badge ${diff<0?'low':'ok'}">
+<span class="badge ${diff===0?'ok':'low'}">
 
-${diff>0?'+':''}${diff}
+${diff > 0 ? '+' : ''}${diff}
 
 </span>
 `;
 
 box.appendChild(d);
 
-}
-
 });
 
 if(box.innerHTML===''){
 
-box.innerHTML=
-'<div class="small">Inventory matches perfectly.</div>';
+box.innerHTML =
+'<div class="small">No matching parts found.</div>';
 
 }
 
@@ -4066,6 +4096,37 @@ save();
   alert('Added to correction queue.');
 
 }
+function manualRecon(){
+
+const partNumber =
+prompt('Part Number');
+
+if(!partNumber) return;
+
+const qty =
+Number(
+prompt('Company Inventory Qty')
+);
+
+if(isNaN(qty)) return;
+
+actualInventory.push({
+
+partNumber:
+partNumber.toUpperCase(),
+
+qty: qty
+
+});
+
+compareInventory();
+
+alert(
+'Part added to reconciliation.'
+);
+
+}
+  
   function renderCorrectionQueue(){
 
   const box =
