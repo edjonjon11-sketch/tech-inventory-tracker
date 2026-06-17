@@ -3245,11 +3245,13 @@ onclick="editUpdate(${i})">
 Edit Update
 </button>
 
+${u.type === 'Replenishment' ? `
 <button
 class="btn good"
 onclick="editReplenishment(${i})">
 Edit Replenishment
 </button>
+` : ''}
 
 <button
 class="btn danger"
