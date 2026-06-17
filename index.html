@@ -163,13 +163,6 @@ onclick="clearRecon()">
 
 Clear Reconciliation
 
-  <button
-class="btn secondary"
-onclick="manualRecon()">
-
-Manual Company Inventory Entry
-
-</button>
   
 </button>
   
@@ -2027,7 +2020,69 @@ function applyReplenishment(){
   showScreen('updates');
 
 }
+function loadManualReconCategories(){
 
+const sel =
+document.getElementById(
+'manualReconCategory'
+);
+
+if(!sel) return;
+
+sel.innerHTML='';
+
+const cats =
+[...new Set(parts.map(
+p=>p.category
+))].sort();
+
+cats.forEach(cat=>{
+
+let o =
+document.createElement('option');
+
+o.value = cat;
+o.textContent = cat;
+
+sel.appendChild(o);
+
+});
+
+loadManualReconParts();
+
+}
+  function loadManualReconParts(){
+
+const cat =
+document.getElementById(
+'manualReconCategory'
+).value;
+
+const partSel =
+document.getElementById(
+'manualReconPart'
+);
+
+partSel.innerHTML='';
+
+parts
+.filter(p=>p.category===cat)
+.forEach((p,i)=>{
+
+let o =
+document.createElement('option');
+
+o.value =
+parts.indexOf(p);
+
+o.textContent =
+`${p.partNumber} - ${p.description}`;
+
+partSel.appendChild(o);
+
+});
+
+}
 function requireTechId(){
 
   if(!currentTechId){
