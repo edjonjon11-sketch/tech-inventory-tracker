@@ -4098,32 +4098,53 @@ save();
 }
 function manualRecon(){
 
-const partNumber =
-prompt('Part Number');
+const partOptions =
+parts.map((p,i)=>
+`${i + 1}. ${p.partNumber} - ${p.description} (Truck Qty ${p.qty})`
+).join('\n');
 
-if(!partNumber) return;
+const choice =
+prompt(
+`Select Company Inventory Part:
+
+${partOptions}
+
+Enter number:`
+);
+
+if(!choice) return;
+
+const index =
+Number(choice) - 1;
+
+const selectedPart =
+parts[index];
+
+if(!selectedPart){
+  alert('Invalid selection.');
+  return;
+}
 
 const qty =
 Number(
-prompt('Company Inventory Qty')
+prompt(
+`Company Inventory Qty for ${selectedPart.partNumber}`
+)
 );
 
-if(isNaN(qty)) return;
+if(isNaN(qty) || qty < 0){
+  alert('Enter a valid quantity.');
+  return;
+}
 
 actualInventory.push({
-
-partNumber:
-partNumber.toUpperCase(),
-
-qty: qty
-
+  partNumber:selectedPart.partNumber,
+  qty:qty
 });
 
 compareInventory();
 
-alert(
-'Part added to reconciliation.'
-);
+alert('Part added to reconciliation.');
 
 }
   
