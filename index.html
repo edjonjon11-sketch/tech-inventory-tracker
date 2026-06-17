@@ -2052,13 +2052,38 @@ function deleteUpdate(i){
     return;
   }
 
+  const update = inventoryUpdates[i];
+
+  if(update.type === 'Replenishment'){
+
+    update.items.forEach(item=>{
+
+      const part = parts.find(
+        p => p.partNumber === item.partNumber
+      );
+
+      if(part){
+
+        part.qty =
+          Math.max(
+            0,
+            Number(part.qty) -
+            Number(item.qtyAdded || 0)
+          );
+
+      }
+
+    });
+
+  }
+
   inventoryUpdates.splice(i,1);
 
   save();
 
   renderAll();
 
-  alert('Inventory update deleted.');
+  alert('Update deleted.');
 
 }
 
