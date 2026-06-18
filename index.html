@@ -1523,7 +1523,53 @@ function deleteTransfer(i){
   alert('Job updated.');
 
 }
+function deleteJobPart(jobNum, partNumber){
 
+  if(
+    !confirm(
+      `Delete ${partNumber} from Job ${jobNum} and restore inventory?`
+    )
+  ){
+    return;
+  }
+
+  const jobIndex = jobs.findIndex(
+    j =>
+      j.jobNumber === jobNum &&
+      j.partNumber === partNumber
+  );
+
+  if(jobIndex === -1){
+    alert('Part not found.');
+    return;
+  }
+
+  const job = jobs[jobIndex];
+
+  const part = parts.find(
+    p => p.partNumber === partNumber
+  );
+
+  // Restore inventory
+  if(part){
+
+    part.qty =
+      Number(part.qty) +
+      Number(job.qtyUsed);
+
+  }
+
+  jobs.splice(jobIndex,1);
+
+  save();
+
+  renderAll();
+
+  alert(
+    `${partNumber} removed and inventory restored.`
+  );
+
+}
 function toggleLowAlerts(){
 
   const box =
@@ -3026,9 +3072,14 @@ Save Notes
 class="btn secondary"
 style="width:auto;padding:6px 10px;margin-top:6px;"
 onclick="editJobPart('${jobNum}','${j.partNumber}')">
-
 Edit
+</button>
 
+<button
+class="btn danger"
+style="width:auto;padding:6px 10px;margin-top:6px;"
+onclick="deleteJobPart('${jobNum}','${j.partNumber}')">
+Delete Part
 </button>
 
 </div>
