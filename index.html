@@ -476,6 +476,21 @@ Export Backup JSON
 
 </button>
 
+  <input
+type="file"
+id="importBackupFile"
+accept=".json"
+style="display:none;"
+onchange="importBackup(event)">
+
+<button
+class="btn good"
+onclick="document.getElementById('importBackupFile').click()">
+
+Import Backup JSON
+
+</button>
+
 </div>
 
 <div class="card">
@@ -2822,7 +2837,81 @@ function renderCurrentJobParts(){
 
   box.appendChild(finishBtn);
 }
+function importBackup(event){
 
+  const file = event.target.files[0];
+
+  if(!file){
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+
+    try{
+
+      const backup =
+        JSON.parse(e.target.result);
+
+      if(backup.parts){
+
+        localStorage.setItem(
+          'tti_parts',
+          JSON.stringify(backup.parts)
+        );
+
+      }
+
+      if(backup.jobs){
+
+        localStorage.setItem(
+          'tti_jobs',
+          JSON.stringify(backup.jobs)
+        );
+
+      }
+
+      if(backup.transfers){
+
+        localStorage.setItem(
+          'tti_transfers',
+          JSON.stringify(backup.transfers)
+        );
+
+      }
+
+      if(backup.inventoryUpdates){
+
+        localStorage.setItem(
+          'tti_inventory_updates',
+          JSON.stringify(
+            backup.inventoryUpdates
+          )
+        );
+
+      }
+
+      alert(
+        'Backup restored successfully.'
+      );
+
+      location.reload();
+
+    }catch(err){
+
+      alert(
+        'Invalid backup file.'
+      );
+
+    }
+
+  };
+
+  reader.readAsText(file);
+
+}
+  
 function finishJob(){
 
   const jobNumber =
@@ -3261,10 +3350,37 @@ function renderAlerts(){
   fill(document.getElementById('homeLowList'));
 }
 function exportData(){
-  const blob=new Blob([JSON.stringify({parts,jobs},null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tech_inventory_backup.json';a.click();
-}
 
+  const backup = {
+
+    parts,
+    jobs,
+    transfers,
+    inventoryUpdates,
+    inventoryAdjustments,
+    selectedJobs,
+    inventoryShortages
+
+  };
+
+  const blob =
+    new Blob(
+      [JSON.stringify(backup,null,2)],
+      {type:'application/json'}
+    );
+
+  const a =
+    document.createElement('a');
+
+  a.href =
+    URL.createObjectURL(blob);
+
+  a.download =
+    `TechInventoryBackup_${new Date().toISOString().split('T')[0]}.json`;
+
+  a.click();
+
+}
   function renderSummary(){
 
   const totalQty = parts.reduce((a,p)=>a+Number(p.qty||0),0);
