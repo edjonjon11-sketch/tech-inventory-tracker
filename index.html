@@ -141,6 +141,8 @@ Inventory Reconciliation
 id="reconDropdown"
 style="display:none;margin-top:12px;">
 
+<div style="display:none;">
+
 <label>
 Upload Actual Inventory Screenshot
 </label>
@@ -156,6 +158,8 @@ class="btn good"
 onclick="scanActualInventory()">
 Scan Actual Inventory
 </button>
+
+</div>
 
 <button
 class="btn danger"
@@ -217,7 +221,9 @@ Compare Inventory
   
 <section id="inventory" class="screen">
   <h2>Truck Inventory</h2>
-  <input
+<div style="display:none;">
+
+<input
 type="file"
 id="inventoryImage"
 accept="image/*">
@@ -227,6 +233,8 @@ class="btn good"
 onclick="scanInventoryImage()">
 Scan Inventory Screenshot
 </button>
+
+</div>
   <input id="search" placeholder="Search part number or description" oninput="renderInventory()">
   <div
 id="categoryTabs"
