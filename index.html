@@ -263,6 +263,14 @@ onclick="showScreen('replenishment')">
 </button>
 
 <button
+class="btn good"
+onclick="saveInventorySnapshot()">
+
+Save Inventory Snapshot
+
+</button>
+  
+<button
 class="btn secondary"
 onclick="openAdjustment()">
 
@@ -2089,6 +2097,35 @@ function applyReplenishment(){
 
   showScreen('updates');
 
+}
+  function saveInventorySnapshot(){
+
+  if(!currentTechId){
+    alert('Please save your Technician ID first.');
+    showScreen('home');
+    return;
+  }
+
+  const snapshotItems = parts.map(p=>({
+    partNumber: p.partNumber,
+    description: p.description,
+    category: p.category,
+    qty: Number(p.qty || 0),
+    minQty: Number(p.minQty || 0)
+  }));
+
+  inventoryUpdates.unshift({
+    date: new Date().toLocaleString(),
+    type: 'Inventory Snapshot',
+    tech: currentTechId,
+    items: snapshotItems
+  });
+
+  save();
+
+  renderAll();
+
+  alert('Inventory snapshot saved to Updates.');
 }
 function loadManualReconCategories(){
 
