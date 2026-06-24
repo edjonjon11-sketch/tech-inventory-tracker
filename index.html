@@ -1400,6 +1400,48 @@ function toggleSummary(id,arrowId){
 
 }
 
+  function emailUpdate(i){
+
+  const u = inventoryUpdates[i];
+
+  if(!u) return;
+
+  let details = '';
+
+  u.items.forEach(item=>{
+
+    details += `
+Part: ${item.partNumber || ''}
+
+Qty: ${item.qty || item.qtyAdded || ''}
+
+Reason: ${item.reason || ''}
+
+-------------------------
+`;
+
+  });
+
+  const body = `
+UPDATE TYPE:
+${u.type}
+
+DATE:
+${u.date}
+
+TECH:
+${u.tech}
+
+================================
+
+${details}
+`;
+
+  window.location.href =
+`mailto:?subject=${encodeURIComponent(u.type)}&body=${encodeURIComponent(body)}`;
+
+}
+  
 function emailTransfers(){
 
   let text='';
@@ -3609,6 +3651,12 @@ onclick="editUpdate(${i})">
 Edit Update
 </button>
 
+<button
+class="btn good"
+onclick="emailUpdate(${i})">
+Email Update
+</button>
+
 ${u.type === 'Replenishment' ? `
 <button
 class="btn good"
@@ -3626,6 +3674,7 @@ Delete Update
 </div>
 `;
 
+    
     box.appendChild(div);
 
   });
