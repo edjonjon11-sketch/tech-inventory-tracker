@@ -1265,78 +1265,137 @@ function saveTransfer(){
 
 function renderTransfers(){
 
-  const box=document.getElementById('transferHistory');
+  const box = document.getElementById('transferHistory');
 
   if(!box) return;
 
-  box.innerHTML='';
+  box.innerHTML = '';
+
+  if(transfers.length === 0){
+
+    box.innerHTML =
+      '<div class="small">No transfer history yet.</div>';
+
+    return;
+  }
 
   transfers.forEach((t,i)=>{
 
-    let d=document.createElement('div');
+    let partsHTML = '';
 
-    d.className='item';
+    // NEW MULTI-PART TRANSFERS
+    if(Array.isArray(t.items) && t.items.length > 0){
 
-    d.innerHTML=`
+      t.items.forEach(item=>{
 
-<div>
+        partsHTML += `
+          <div class="item">
 
-  <b>${t.partNumber}</b>
+            <div>
 
-  <div class="small">
-    ${t.description}
-  </div>
+              <b>${item.partNumber || ''}</b>
 
-  <div class="small">
-    ${t.from} → ${t.to}
-  </div>
+              <div class="small">
+                ${item.description || ''}
+              </div>
 
-  <div class="small">
-    Qty: ${t.qty}
-  </div>
+            </div>
 
-  <div class="small">
-    ${t.date}
-  </div>
+            <span class="badge">
+              Qty: ${item.qty || 0}
+            </span>
 
-</div>
+          </div>
+        `;
 
-<div
-style="
-display:flex;
-flex-direction:column;
-gap:8px;
-">
+      });
 
-<button
-class="btn good"
-onclick="emailSingleTransfer(${i})"
-style="
-width:auto;
-padding:8px 12px;
-">
+    }
 
-Email
+    // SUPPORT OLD TRANSFERS
+    else{
 
-</button>
+      partsHTML = `
+        <div class="item">
 
-<button
-class="btn danger"
-onclick="deleteTransfer(${i})"
-style="
-width:auto;
-padding:8px 12px;
-">
+          <div>
 
-Delete
+            <b>${t.partNumber || 'Unknown Part'}</b>
 
-</button>
+            <div class="small">
+              ${t.description || ''}
+            </div>
 
-</div>
+          </div>
 
-`;
+          <span class="badge">
+            Qty: ${t.qty || 0}
+          </span>
 
-    box.appendChild(d);
+        </div>
+      `;
+
+    }
+
+
+    const div = document.createElement('div');
+
+    div.className = 'card';
+
+    div.innerHTML = `
+
+      <div>
+
+        <b>
+          ${t.type || 'Transfer'}
+        </b>
+
+        <div class="small">
+          From: ${t.from || ''}
+        </div>
+
+        <div class="small">
+          To: ${t.to || ''}
+        </div>
+
+        <div class="small">
+          Technician: ${t.techName || ''}
+        </div>
+
+        <div class="small">
+          ${t.date || ''}
+        </div>
+
+      </div>
+
+
+      <div style="margin-top:12px;">
+
+        ${partsHTML}
+
+      </div>
+
+
+      <button
+      class="btn good"
+      onclick="emailSingleTransfer(${i})">
+
+      Email Transfer
+
+      </button>
+
+
+      <button
+      class="btn danger"
+      onclick="deleteTransfer(${i})">
+
+      Delete Transfer
+
+      </button>
+
+    `;
+
+    box.appendChild(div);
 
   });
 
@@ -1520,55 +1579,89 @@ function removeTransferItem(i){
 
 function emailTransfers(){
 
-  let text='';
+  if(transfers.length === 0){
 
-  if(transfers.length===0){
+    alert('No transfer history available.');
 
-    text='No transfer history available.';
-
-  } else {
-
-    transfers.forEach(t=>{
-
-      text +=
-`
-PART:
-${t.partNumber}
-
-DESCRIPTION:
-${t.description}
-
-QTY:
-${t.qty}
-
-FROM:
-${t.from}
-
-TO:
-${t.to}
-
-DATE:
-${t.date}
-
-----------------------------
-
-`;
-
-    });
-
+    return;
   }
 
-  const body =
-`
-TRUCK TRANSFER REPORT
+  let text = '';
 
-======================
+  transfers.forEach(t=>{
 
-${text}
+    text += `
+TRANSFER TYPE:
+${t.type || 'Transfer'}
+
+FROM:
+${t.from || ''}
+
+TO:
+${t.to || ''}
+
+TECHNICIAN:
+${t.techName || ''}
+
+DATE:
+${t.date || ''}
+
+PARTS
+--------------------------------
 `;
 
+    if(Array.isArray(t.items) && t.items.length > 0){
+
+      t.items.forEach(item=>{
+
+        text += `
+PART:
+${item.partNumber || ''}
+
+DESCRIPTION:
+${item.description || ''}
+
+QTY:
+${item.qty || 0}
+
+`;
+
+      });
+
+    }else{
+
+      text += `
+PART:
+${t.partNumber || ''}
+
+DESCRIPTION:
+${t.description || ''}
+
+QTY:
+${t.qty || 0}
+
+`;
+
+    }
+
+    text += `
+================================
+
+`;
+
+  });
+
+
+  const body =
+`TRUCK TRANSFER REPORT
+
+${text}`;
+
+
   window.location.href =
-`mailto:?subject=Truck Transfer Report&body=${encodeURIComponent(body)}`;
+  `mailto:?subject=${encodeURIComponent(
+    'Truck Transfer Report'
+  )}&body=${encodeURIComponent(body)}`;
 
 }
 
