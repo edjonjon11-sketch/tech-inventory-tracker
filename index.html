@@ -343,6 +343,12 @@ Show More Jobs
 
   <div class="card">
 
+<label>Transfer Type</label>
+<select id="transferType">
+  <option value="giving">Giving Parts</option>
+  <option value="receiving">Receiving Parts</option>
+</select>
+    
     <label>From Tech</label>
     <input id="transferFrom">
 
@@ -355,9 +361,15 @@ Show More Jobs
     <label>Qty</label>
     <input id="transferQty" type="number" value="1">
 
-    <button class="btn good" onclick="saveTransfer()">
-      Save Transfer
-    </button>
+    <button class="btn secondary" onclick="addTransferItem()">
+  Add Part To Transfer
+</button>
+
+<div id="currentTransferList"></div>
+
+<button class="btn good" onclick="saveTransfer()">
+  Save Full Transfer
+</button>
 
   </div>
 
@@ -961,6 +973,7 @@ localStorage.getItem(
 ) || '[]'
 );
 let selectedCategory = '';
+let transferItems = [];
 let replenishItems = [];
 let correctionQueue = [];
 let inventoryShortages =
@@ -1175,83 +1188,79 @@ function addNewPart(){
   
 function saveTransfer(){
 
-  const i =
-  Number(
-    document.getElementById(
-      'transferPart'
-    ).value
-  );
+  const type = document.getElementById('transferType').value;
 
-  const qty =
-  Number(
-    document.getElementById(
-      'transferQty'
-    ).value
-  ) || 1;
+  const fromTech = document.getElementById('transferFrom').value.trim();
+  const toTech = document.getElementById('transferTo').value.trim();
 
-  const p = parts[i];
-
-  if(!p) return;
-
-  if(qty < 1){
-
-    alert('Enter valid qty.');
-
+  if(!fromTech || !toTech){
+    alert('Enter From Tech and To Tech.');
     return;
-
   }
 
-  if(Number(p.qty) < qty){
-
-    alert(
-      `Not enough inventory.
-
-Available: ${p.qty}`
-    );
-
+  if(transferItems.length === 0){
+    alert('Add at least one part to transfer.');
     return;
-
   }
 
-  p.qty =
-    Number(p.qty) - qty;
+  for(const item of transferItems){
+
+    const p = parts[item.index];
+
+    if(!p) continue;
+
+    if(type === 'giving'){
+
+      if(Number(p.qty) < Number(item.qty)){
+        alert(`Not enough inventory for ${p.partNumber}. Available: ${p.qty}`);
+        return;
+      }
+
+      p.qty = Number(p.qty) - Number(item.qty);
+
+    } else if(type === 'receiving'){
+
+      p.qty = Number(p.qty) + Number(item.qty);
+
+    }
+
+  }
 
   transfers.unshift({
-
-    date:
-    new Date().toLocaleString(),
-
-    from:
-    document.getElementById(
-      'transferFrom'
-    ).value,
-
-    to:
-    document.getElementById(
-      'transferTo'
-    ).value,
-
-    partNumber:
-    p.partNumber,
-
-    description:
-    p.description,
-
-    qty,
-
-    techName:
-    currentTechId
-
+    date:new Date().toLocaleString(),
+    type:type === 'giving' ? 'Giving Parts' : 'Receiving Parts',
+    from:fromTech,
+    to:toTech,
+    techName:currentTechId,
+    items:transferItems.map(item=>({
+      partNumber:item.partNumber,
+      description:item.description,
+      qty:item.qty
+    }))
   });
+
+  inventoryUpdates.unshift({
+    date:new Date().toLocaleString(),
+    type:type === 'giving' ? 'Transfer Out' : 'Transfer In',
+    tech:currentTechId,
+    items:transferItems.map(item=>({
+      partNumber:item.partNumber,
+      description:item.description,
+      qty:item.qty,
+      from:fromTech,
+      to:toTech
+    }))
+  });
+
+  transferItems = [];
 
   save();
 
   renderAll();
 
-  alert(
-    `${qty} deducted from ${p.partNumber}`
-  );
+  renderCurrentTransferList();
 
+  alert('Transfer saved.');
 }
 
 function renderTransfers(){
@@ -1441,7 +1450,74 @@ ${details}
 `mailto:?subject=${encodeURIComponent(u.type)}&body=${encodeURIComponent(body)}`;
 
 }
-  
+
+function addTransferItem(){
+
+  const i = Number(document.getElementById('transferPart').value);
+  const qty = Number(document.getElementById('transferQty').value) || 1;
+  const p = parts[i];
+
+  if(!p) return;
+
+  if(qty < 1){
+    alert('Enter valid qty.');
+    return;
+  }
+
+  transferItems.push({
+    index:i,
+    partNumber:p.partNumber,
+    description:p.description,
+    qty:qty
+  });
+
+  renderCurrentTransferList();
+
+  document.getElementById('transferQty').value = 1;
+}
+  function renderCurrentTransferList(){
+
+  const box = document.getElementById('currentTransferList');
+
+  if(!box) return;
+
+  box.innerHTML = '';
+
+  if(transferItems.length === 0){
+    return;
+  }
+
+  transferItems.forEach((item,i)=>{
+
+    let d = document.createElement('div');
+    d.className = 'item';
+
+    d.innerHTML = `
+      <div>
+        <b>${item.partNumber}</b>
+        <div class="small">${item.description}</div>
+        <div class="small">Qty: ${item.qty}</div>
+      </div>
+
+      <button
+      class="btn danger"
+      style="width:auto;padding:6px 10px;"
+      onclick="removeTransferItem(${i})">
+      Delete
+      </button>
+    `;
+
+    box.appendChild(d);
+
+  });
+}
+function removeTransferItem(i){
+
+  transferItems.splice(i,1);
+
+  renderCurrentTransferList();
+}
+
 function emailTransfers(){
 
   let text='';
