@@ -1578,33 +1578,77 @@ function emailSingleTransfer(i){
 
   if(!t) return;
 
+  let partsText = '';
+
+  // NEW MULTI-PART TRANSFERS
+  if(Array.isArray(t.items) && t.items.length > 0){
+
+    t.items.forEach(item=>{
+
+      partsText += `
+PART:
+${item.partNumber || ''}
+
+DESCRIPTION:
+${item.description || ''}
+
+QTY:
+${item.qty || 0}
+
+----------------------------
+
+`;
+
+    });
+
+  // SUPPORT OLD SINGLE-PART TRANSFERS
+  }else{
+
+    partsText = `
+PART:
+${t.partNumber || ''}
+
+DESCRIPTION:
+${t.description || ''}
+
+QTY:
+${t.qty || 0}
+
+----------------------------
+
+`;
+
+  }
+
   const body =
 `TRUCK TRANSFER
 
-PART:
-${t.partNumber}
-
-DESCRIPTION:
-${t.description}
-
-QTY:
-${t.qty}
+TRANSFER TYPE:
+${t.type || 'Transfer'}
 
 FROM:
-${t.from}
+${t.from || ''}
 
 TO:
-${t.to}
+${t.to || ''}
 
-TRANSFER TECH:
+TECHNICIAN:
 ${t.techName || currentTechId || ''}
 
 DATE:
-${t.date}
+${t.date || ''}
+
+================================
+
+PARTS
+
+${partsText}
 `;
 
   window.location.href =
-`mailto:?subject=Truck Transfer ${t.partNumber}&body=${encodeURIComponent(body)}`;
+  `mailto:?subject=${encodeURIComponent(
+    `Truck Transfer - ${t.type || 'Transfer'}`
+  )}&body=${encodeURIComponent(body)}`;
 
 }
   
