@@ -4591,7 +4591,25 @@ ${c.notes}
 
 }
   function addCorrectionToQueue(){
+  const removePart =
+    document.getElementById('corrRemove').value.trim();
 
+  const addPart =
+    document.getElementById('corrAdd').value.trim();
+
+  const addQty = Number(
+    document.getElementById('corrAddQty').value
+  );
+
+  if (!removePart && !addPart) {
+    alert('Choose a part to add or remove.');
+    return;
+  }
+
+  if (addPart && (!Number.isInteger(addQty) || addQty <= 0)) {
+    alert('Enter a valid quantity for the part being added.');
+    return;
+  }
   correctionQueue.push({
 
     job:
