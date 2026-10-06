@@ -726,17 +726,28 @@ Replenishments and Reporting.
 <label>Job Number</label>
 <input id="corrJob">
 
-<label>Remove Part</label>
-<select id="corrRemove"></select>
+<label>Request Type</label>
+<select id="correctionType" onchange="updateCorrectionType()">
+  <option value="add">Add Only</option>
+  <option value="remove">Remove Only</option>
+  <option value="replace">Replace Part</option>
+</select>
 
-<label>Remove Qty</label>
-<input id="corrRemoveQty" type="number" value="1">
+<div id="correctionRemoveFields" style="display:none;">
+  <label>Remove Part</label>
+  <select id="corrRemove"></select>
 
-<label>Add Part</label>
-<select id="corrAdd"></select>
+  <label>Remove Qty</label>
+  <input id="corrRemoveQty" type="number" min="1" step="1" value="1">
+</div>
 
-<label>Add Qty</label>
-<input id="corrAddQty" type="number" value="1">
+<div id="correctionAddFields">
+  <label>Add Part</label>
+  <select id="corrAdd"></select>
+
+  <label>Add Qty</label>
+  <input id="corrAddQty" type="number" min="1" step="1" value="1">
+</div>
 
 <label>Reason</label>
 
