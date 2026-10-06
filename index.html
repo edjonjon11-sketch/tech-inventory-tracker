@@ -4540,110 +4540,76 @@ ${j.qtyUsed}
   renderCorrectionQueue();
 
 }
-function emailCorrection(){
+  function updateCorrectionType() {
+  const type = document.getElementById('correctionType').value;
+  const removing = type !== 'add';
+  const adding = type !== 'remove';
 
-  if(correctionQueue.length===0){
+  document.getElementById('correctionRemoveFields').style.display =
+    removing ? 'block' : 'none';
 
-    alert(
-      'Add at least one correction.'
-    );
+  document.getElementById('correctionAddFields').style.display =
+    adding ? 'block' : 'none';
 
-    return;
-  }
-
-  let body =
-
-`PARTS CORRECTION REPORT
-
-TECH:
-${currentTechId}
-
-DATE:
-${new Date().toLocaleString()}
-
-================================
-
-`;
-
-  correctionQueue.forEach(c=>{
-
-    body +=
-
-`
-JOB:
-${c.job}
-
-REMOVE:
-${c.removePart}
-
-REMOVE QTY:
-${c.removeQty}
-
-ADD:
-${c.addPart}
-
-ADD QTY:
-${c.addQty}
-
-REASON:
-${c.reason}
-
-NOTES:
-${c.notes}
-
---------------------------------
-
-`;
-
-  });
-
-  window.location.href =
-`mailto:?subject=Parts Correction Report&body=${encodeURIComponent(body)}`;
-
+  document.getElementById('corrRemove').disabled = !removing;
+  document.getElementById('corrRemoveQty').disabled = !removing;
+  document.getElementById('corrAdd').disabled = !adding;
+  document.getElementById('corrAddQty').disabled = !adding;
 }
-  function addCorrectionToQueue(){
-  const removePart =
-    document.getElementById('corrRemove').value.trim();
+  function addCorrectionToQueue() {
+  const type = document.getElementById('correctionType').value;
+  const job = document.getElementById('corrJob').value.trim();
 
-  const addPart =
-    document.getElementById('corrAdd').value.trim();
+  const removing = type !== 'add';
+  const adding = type !== 'remove';
 
-  const addQty = Number(
-    document.getElementById('corrAddQty').value
-  );
+  const removePart = removing
+    ? document.getElementById('corrRemove').value.trim()
+    : '';
 
-  if (!removePart && !addPart) {
-    alert('Choose a part to add or remove.');
+  const removeQty = removing
+    ? Number(document.getElementById('corrRemoveQty').value)
+    : '';
+
+  const addPart = adding
+    ? document.getElementById('corrAdd').value.trim()
+    : '';
+
+  const addQty = adding
+    ? Number(document.getElementById('corrAddQty').value)
+    : '';
+
+  if (!job) {
+    alert('Enter the job number.');
     return;
   }
 
-  if (addPart && (!Number.isInteger(addQty) || addQty <= 0)) {
-    alert('Enter a valid quantity for the part being added.');
+  if (removing && (
+    !removePart ||
+    !Number.isInteger(removeQty) ||
+    removeQty <= 0
+  )) {
+    alert('Choose the part to remove and enter a valid quantity.');
     return;
   }
+
+  if (adding && (
+    !addPart ||
+    !Number.isInteger(addQty) ||
+    addQty <= 0
+  )) {
+    alert('Choose the part to add and enter a valid quantity.');
+    return;
+  }
+
   correctionQueue.push({
-
-    job:
-      document.getElementById('corrJob').value,
-
-    removePart:
-      document.getElementById('corrRemove').value,
-
-    removeQty:
-      document.getElementById('corrRemoveQty').value,
-
-    addPart:
-      document.getElementById('corrAdd').value,
-
-    addQty:
-      document.getElementById('corrAddQty').value,
-
-    reason:
-      document.getElementById('correctionReason').value,
-
-    notes:
-      document.getElementById('correctionNotes').value
-
+    job,
+    removePart,
+    removeQty,
+    addPart,
+    addQty,
+    reason: document.getElementById('correctionReason').value,
+    notes: document.getElementById('correctionNotes').value.trim()
   });
 const correction = correctionQueue[
   correctionQueue.length - 1
@@ -4748,58 +4714,93 @@ alert('Part added to reconciliation.');
 
 }
   
-  function renderCorrectionQueue(){
+  function emailCorrection() {
+  if (correctionQueue.length === 0) {
+    alert('Add at least one correction.');
+    return;
+  }
 
-  const box =
-    document.getElementById(
-      'correctionQueueList'
-    );
+  let body = `PARTS CORRECTION REQUEST
 
-  if(!box) return;
+TECH: ${currentTechId}
+DATE: ${new Date().toLocaleString()}
 
-  box.innerHTML='';
+Please make the following changes to the listed tickets.
 
-  correctionQueue.forEach((c,i)=>{
-
-    let div =
-      document.createElement('div');
-
-    div.className='card';
-
-    div.innerHTML=`
-
-<b>Job ${c.job}</b>
-
-<div class="small">
-Remove:
-${c.removePart}
-(${c.removeQty})
-</div>
-
-<div class="small">
-Add:
-${c.addPart}
-(${c.addQty})
-</div>
-
-<div class="small">
-${c.reason}
-</div>
-
-<button
-class="btn danger"
-onclick="removeCorrection(${i})">
-
-Delete
-
-</button>
+================================
 
 `;
 
-    box.appendChild(div);
+  correctionQueue.forEach(c => {
+    body += `JOB: ${c.job}\n\n`;
 
+    if (c.removePart) {
+      body += `Please REMOVE:
+${c.removePart}
+Quantity: ${c.removeQty}
+
+`;
+    }
+
+    if (c.addPart) {
+      body += `Please ADD:
+${c.addPart}
+Quantity: ${c.addQty}
+
+`;
+    }
+
+    body += `REASON: ${c.reason}
+NOTES: ${c.notes || 'None'}
+
+--------------------------------
+
+`;
   });
 
+  window.location.href =
+    `mailto:?subject=${encodeURIComponent('Parts Correction Request')}&body=${encodeURIComponent(body)}`;
+}
+
+function renderCorrectionQueue() {
+  const box = document.getElementById('correctionQueueList');
+  if (!box) return;
+
+  box.innerHTML = '';
+
+  correctionQueue.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.className = 'card';
+
+    const title = document.createElement('b');
+    title.textContent = `Job ${c.job}`;
+    div.appendChild(title);
+
+    const addLine = text => {
+      const line = document.createElement('div');
+      line.className = 'small';
+      line.textContent = text;
+      div.appendChild(line);
+    };
+
+    if (c.removePart) {
+      addLine(`Remove: ${c.removePart} (${c.removeQty})`);
+    }
+
+    if (c.addPart) {
+      addLine(`Add: ${c.addPart} (${c.addQty})`);
+    }
+
+    addLine(c.reason);
+
+    const button = document.createElement('button');
+    button.className = 'btn danger';
+    button.textContent = 'Delete';
+    button.onclick = () => removeCorrection(i);
+    div.appendChild(button);
+
+    box.appendChild(div);
+  });
 }
 init();
 </script>
